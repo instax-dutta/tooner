@@ -191,6 +191,6 @@ export default function ProcessingView({ file, progress, onCancel }) {
                 <div className="w-2 h-2 rounded-full bg-[--neon-green] animate-pulse shadow-[0_0_10px_var(--glow-green)]" />
                 <span className="text-[--text-muted] font-medium">Processing locally in your browser</span>
             </motion.div>
-        </motion.div> >
+        </motion.div>
     );
 }

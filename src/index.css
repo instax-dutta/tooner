@@ -1,12 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 /* =============================================================================
    TOONER - FUNKY DARK DESIGN SYSTEM
    Cyberpunk-inspired with neon accents and glassmorphism
    ============================================================================= */
-
-/* Google Fonts - Outfit for funky professional look */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /* Custom xs breakpoint */
 @media (min-width: 480px) {
