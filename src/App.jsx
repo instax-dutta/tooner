@@ -10,20 +10,19 @@ import { processFile } from './utils/fileProcessors';
 import { generateToonFile } from './utils/tokenizer';
 
 /**
- * Tooner - Privacy-focused document tokenization
- * LOSSLESS: All processing preserves original content
+ * Tooner - Cyberpunk Document Tokenization
  */
 function App() {
-  const [state, setState] = useState('idle'); // idle | processing | done | error
+  const [state, setState] = useState('idle');
   const [file, setFile] = useState(null);
   const [progress, setProgress] = useState(0);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
 
-  // Initialize Lenis smooth scroll
+  // Lenis smooth scroll
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 1.4,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       smoothWheel: true,
@@ -38,12 +37,12 @@ function App() {
     return () => lenis.destroy();
   }, []);
 
-  // GSAP page transition
+  // GSAP page entrance
   useEffect(() => {
     gsap.fromTo(
       'body',
       { opacity: 0 },
-      { opacity: 1, duration: 0.4, ease: 'power2.out' }
+      { opacity: 1, duration: 0.6, ease: 'power2.out' }
     );
   }, []);
 
@@ -54,14 +53,12 @@ function App() {
     setError(null);
 
     try {
-      // Process file to extract text
       const { content, format } = await processFile(selectedFile, (p) => {
-        setProgress(p * 0.6); // 0-60% for extraction
+        setProgress(p * 0.6);
       });
 
       setProgress(70);
 
-      // Generate .toon file (LOSSLESS)
       const { toonFile, stats } = await generateToonFile({
         originalFilename: selectedFile.name,
         originalFormat: format,
@@ -70,9 +67,7 @@ function App() {
       });
 
       setProgress(100);
-
-      // Small delay for animation
-      await new Promise((r) => setTimeout(r, 300));
+      await new Promise((r) => setTimeout(r, 400));
 
       setResults({ toonFile, stats });
       setState('done');
@@ -99,21 +94,9 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen min-h-dvh bg-[--bg-primary] relative overflow-hidden">
-      {/* Ambient background gradient */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] 
-                        bg-[radial-gradient(circle,_var(--accent-glow)_0%,_transparent_60%)] 
-                        opacity-20 blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] 
-                        bg-[radial-gradient(circle,_rgba(34,197,94,0.15)_0%,_transparent_60%)] 
-                        opacity-20 blur-3xl" />
-      </div>
-
-      {/* Header - simplified, no settings */}
+    <div className="min-h-screen min-h-dvh relative overflow-hidden">
       <Header />
 
-      {/* Main content with proper spacing from header */}
       <main className="pt-20 sm:pt-24">
         <AnimatePresence mode="wait">
           {state === 'idle' && (
@@ -144,20 +127,19 @@ function App() {
           )}
 
           {state === 'error' && (
-            <div
-              key="error"
-              className="flex flex-col items-center justify-center min-h-[calc(100vh-6rem)] px-6"
-            >
-              <div className="card max-w-md w-full p-8 text-center">
-                <div className="w-16 h-16 rounded-full bg-[--error]/10 flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-[--error]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div key="error" className="flex flex-col items-center justify-center min-h-[calc(100vh-6rem)] px-6">
+              <div className="glass-card max-w-md w-full p-10 text-center">
+                <div className="w-20 h-20 rounded-full bg-[--error]/10 border border-[--error]/30 
+                               flex items-center justify-center mx-auto mb-8
+                               shadow-[0_0_40px_rgba(255,69,58,0.3)]">
+                  <svg className="w-10 h-10 text-[--error]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </div>
-                <h2 className="text-xl font-semibold text-[--text-primary] mb-3">
+                <h2 className="text-2xl font-bold text-[--text-primary] mb-4">
                   Processing Failed
                 </h2>
-                <p className="text-[--text-secondary] mb-6 text-sm leading-relaxed">{error}</p>
+                <p className="text-[--text-secondary] mb-8 text-sm leading-relaxed">{error}</p>
                 <button onClick={handleReset} className="btn btn-primary w-full">
                   Try Again
                 </button>
