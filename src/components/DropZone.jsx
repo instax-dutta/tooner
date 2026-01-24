@@ -152,8 +152,6 @@ export default function DropZone({ onFileSelect, isProcessing }) {
         return () => document.removeEventListener('paste', handlePaste);
     }, [handlePaste]);
 
-    const formatPills = ['pdf', 'docx', 'xlsx', 'csv', 'json', 'md', 'txt'];
-
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -304,39 +302,18 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                 )}
             </AnimatePresence>
 
-            {/* Supported formats - More spacing */}
-            <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
-                className="mt-12 sm:mt-16 text-center"
+            {/* Supported formats - Clean minimal text */}
+            <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+                className="mt-10 text-[--text-muted] text-sm"
             >
-                <p className="text-[--text-muted] text-sm mb-4">Supports 30+ formats</p>
-                <div className="flex flex-wrap justify-center gap-3 max-w-lg">
-                    {formatPills.map((ext, i) => (
-                        <motion.span
-                            key={ext}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.5 + i * 0.04 }}
-                            className="px-3 py-1.5 rounded-full bg-[--bg-secondary] border border-[--border]
-                         text-[--text-secondary] text-sm font-mono
-                         hover:border-[--accent] hover:text-[--accent] 
-                         transition-colors duration-150 cursor-default"
-                        >
-                            .{ext}
-                        </motion.span>
-                    ))}
-                    <motion.span
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.78 }}
-                        className="px-3 py-1.5 text-[--text-muted] text-sm"
-                    >
-                        +23 more
-                    </motion.span>
-                </div>
-            </motion.div>
+                Supports{' '}
+                <span className="text-[--text-secondary]">PDF, DOCX, Excel, CSV, JSON, Markdown</span>
+                {' '}and{' '}
+                <span className="text-[--text-secondary]">30+ other formats</span>
+            </motion.p>
 
             {/* Footer attribution - More space */}
             <motion.div
