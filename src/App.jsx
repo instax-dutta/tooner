@@ -97,7 +97,7 @@ function App() {
     <div className="min-h-screen min-h-dvh relative overflow-hidden">
       <Header />
 
-      <main className="pt-20 sm:pt-24">
+      <main className="pt-14 sm:pt-16">
         <AnimatePresence mode="wait">
           {state === 'idle' && (
             <DropZone

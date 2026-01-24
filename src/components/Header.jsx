@@ -3,82 +3,67 @@ import { motion } from 'framer-motion';
 import gsap from 'gsap';
 
 /**
- * Funky cyberpunk header with neon accents
+ * Slim, modern header with neon accents
  */
 export default function Header() {
     const logoRef = useRef(null);
-    const badgeRef = useRef(null);
 
-    // GSAP entrance animations
     useEffect(() => {
         const ctx = gsap.context(() => {
-            // Logo glow pulse
             gsap.to(logoRef.current, {
-                boxShadow: '0 0 30px rgba(0, 240, 255, 0.6), 0 0 60px rgba(191, 90, 242, 0.4)',
+                boxShadow: '0 0 20px rgba(0, 240, 255, 0.5), 0 0 40px rgba(191, 90, 242, 0.3)',
                 duration: 2,
                 repeat: -1,
                 yoyo: true,
                 ease: 'sine.inOut',
             });
-
-            // Badge float
-            gsap.to(badgeRef.current, {
-                y: -3,
-                duration: 2.5,
-                repeat: -1,
-                yoyo: true,
-                ease: 'sine.inOut',
-            });
         });
-
         return () => ctx.revert();
     }, []);
 
     return (
         <motion.header
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="fixed top-0 left-0 right-0 z-50 glass-strong"
         >
-            <div className="container h-18 sm:h-20 flex items-center justify-between py-4">
+            <div className="container h-14 sm:h-16 flex items-center justify-between">
                 {/* Logo */}
                 <motion.a
                     href="https://tooner.sdad.pro"
-                    className="flex items-center gap-3 sm:gap-4 group"
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center gap-2.5 sm:gap-3 group"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                 >
                     <div
                         ref={logoRef}
-                        className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center
-                       bg-gradient-to-br from-[--neon-cyan] via-[--neon-purple] to-[--neon-pink]
-                       shadow-lg"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center
+                       bg-gradient-to-br from-[--neon-cyan] via-[--neon-purple] to-[--neon-pink]"
                     >
-                        <span className="text-xl sm:text-2xl font-bold text-[--bg-deep]">T</span>
+                        <span className="text-base sm:text-lg font-bold text-[--bg-deep]">T</span>
                     </div>
-                    <div className="flex flex-col">
-                        <span className="text-lg sm:text-xl font-bold tracking-tight text-[--text-primary]">
+                    <div className="hidden xs:flex flex-col">
+                        <span className="text-base sm:text-lg font-semibold tracking-tight text-[--text-primary] leading-tight">
                             Tooner
                         </span>
-                        <span className="text-[10px] text-[--text-muted] tracking-widest uppercase hidden sm:block">
+                        <span className="text-[9px] text-[--text-muted] tracking-[0.2em] uppercase leading-none">
                             Token Engine
                         </span>
                     </div>
+                    <span className="xs:hidden text-base font-semibold text-[--text-primary]">Tooner</span>
                 </motion.a>
 
                 {/* Privacy Badge */}
                 <motion.div
-                    ref={badgeRef}
-                    initial={{ opacity: 0, scale: 0.8 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3, type: 'spring', stiffness: 300 }}
-                    className="flex items-center gap-2.5 px-4 py-2.5 rounded-full 
-                     bg-[--neon-green]/10 border border-[--neon-green]/30
-                     shadow-[0_0_20px_rgba(50,215,75,0.15)]"
+                    transition={{ delay: 0.2 }}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full 
+                     bg-[--neon-green]/10 border border-[--neon-green]/30"
                 >
-                    <div className="w-2 h-2 rounded-full bg-[--neon-green] animate-pulse shadow-[0_0_10px_var(--glow-green)]" />
-                    <span className="text-sm font-medium text-[--neon-green]">100% Local</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-[--neon-green] animate-pulse" />
+                    <span className="text-xs font-medium text-[--neon-green]">Local</span>
                 </motion.div>
             </div>
         </motion.header>
