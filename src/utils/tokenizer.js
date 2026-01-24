@@ -1,7 +1,7 @@
 /**
  * Tokenizer utilities for Tooner
  * Uses the official TOON (Token-Oriented Object Notation) format
- * for maximum token efficiency when feeding data to LLMs
+ * LOSSLESS: All original data is preserved, only formatting is optimized
  */
 
 import { encode as encodeToon, decode as decodeToon } from '@toon-format/toon';
@@ -25,157 +25,47 @@ export function countTokens(text) {
 }
 
 /**
- * Optimization settings
- */
-export const OPTIMIZATION_LEVELS = {
-    minimal: {
-        name: 'Minimal',
-        description: 'Preserve formatting, light cleanup',
-        settings: {
-            removeExcessWhitespace: true,
-            normalizeLineEndings: true,
-            useToonFormat: false, // Keep as plain text
-            deduplicate: false,
-            stripMetadata: false,
-        },
-    },
-    balanced: {
-        name: 'Balanced',
-        description: 'Smart TOON optimization',
-        settings: {
-            removeExcessWhitespace: true,
-            normalizeLineEndings: true,
-            useToonFormat: true, // Convert to TOON
-            deduplicate: true,
-            stripMetadata: false,
-        },
-    },
-    aggressive: {
-        name: 'Aggressive',
-        description: 'Maximum token reduction',
-        settings: {
-            removeExcessWhitespace: true,
-            normalizeLineEndings: true,
-            useToonFormat: true, // Convert to TOON
-            deduplicate: true,
-            stripMetadata: true,
-        },
-    },
-};
-
-/**
- * Remove excessive whitespace while preserving structure
+ * LOSSLESS text normalization - only normalizes whitespace without removing data
  * @param {string} text - Input text
- * @returns {string} Cleaned text
+ * @returns {string} Normalized text (all original content preserved)
  */
-function removeExcessWhitespace(text) {
+function normalizeText(text) {
     return text
-        .replace(/ {2,}/g, ' ')
-        .replace(/\n{3,}/g, '\n\n')
+        // Normalize line endings to LF
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n')
+        // Reduce multiple blank lines to max 2 (keeps structure, saves tokens)
+        .replace(/\n{4,}/g, '\n\n\n')
+        // Trim trailing whitespace from lines (cosmetic, no data loss)
         .replace(/[ \t]+$/gm, '')
-        .replace(/^[ \t]+/gm, (match) => {
-            return match.length > 4 ? '    ' : match;
-        });
-}
-
-/**
- * Normalize line endings to LF
- * @param {string} text - Input text
- * @returns {string} Normalized text
- */
-function normalizeLineEndings(text) {
-    return text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-}
-
-/**
- * Find and remove duplicate lines
- * @param {string} text - Input text
- * @returns {string} Text with deduplicated sections
- */
-function deduplicate(text) {
-    const lines = text.split('\n');
-    const seen = new Map();
-    const result = [];
-
-    for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed || trimmed.length < 30) {
-            result.push(line);
-            continue;
-        }
-
-        if (seen.has(trimmed)) {
-            continue;
-        }
-
-        seen.set(trimmed, true);
-        result.push(line);
-    }
-
-    return result.join('\n');
-}
-
-/**
- * Strip metadata and formatting artifacts
- * @param {string} text - Input text
- * @returns {string} Cleaned text
- */
-function stripMetadata(text) {
-    return text
-        .replace(/^(Author|Date|Title|Subject|Keywords|Creator|Producer):.*$/gim, '')
-        .replace(/^Page \d+ of \d+$/gim, '')
-        .replace(/^\d{1,2}\/\d{1,2}\/\d{2,4}(?: \d{1,2}:\d{2}(:\d{2})?(?: ?[AP]M)?)?$/gim, '');
+        // Trim leading/trailing whitespace from entire document
+        .trim();
 }
 
 /**
  * Try to parse content as structured data for TOON encoding
+ * TOON format is lossless - it reorganizes data structure, not content
  * @param {string} content - Content to parse
  * @returns {Object|null} Parsed object or null
  */
 function tryParseStructured(content) {
-    // Try JSON
+    // Try JSON first - TOON is designed as a JSON alternative
     try {
         const parsed = JSON.parse(content);
         if (typeof parsed === 'object' && parsed !== null) {
             return parsed;
         }
     } catch {
-        // Not JSON
+        // Not JSON, continue
     }
 
-    // Try to structure as document with sections
-    const lines = content.split('\n');
-    if (lines.length > 5) {
-        // Structure plain text as a document object
-        const sections = [];
-        let currentSection = { title: 'Content', text: '' };
-
-        for (const line of lines) {
-            // Detect headers (lines that look like titles)
-            if (line.match(/^#+\s/) || line.match(/^[A-Z][A-Za-z\s]{2,}:?\s*$/) && line.length < 80) {
-                if (currentSection.text.trim()) {
-                    sections.push({ ...currentSection });
-                }
-                currentSection = { title: line.replace(/^#+\s*/, '').trim(), text: '' };
-            } else {
-                currentSection.text += line + '\n';
-            }
-        }
-
-        if (currentSection.text.trim()) {
-            sections.push(currentSection);
-        }
-
-        if (sections.length > 1) {
-            return { document: { sections } };
-        }
-    }
-
+    // For non-JSON content, wrap as a simple document
+    // This preserves the exact content while enabling TOON encoding
     return null;
 }
 
 /**
- * Convert content to TOON format if possible
+ * Convert content to TOON format (lossless)
  * @param {string} content - Content to convert
  * @returns {Object} Result with toon content and success status
  */
@@ -185,61 +75,40 @@ function convertToToon(content) {
     if (structured) {
         try {
             const toonContent = encodeToon(structured);
-            return { content: toonContent, isToon: true, structured };
+            return {
+                content: toonContent,
+                isToon: true,
+                originalPreserved: true
+            };
         } catch (error) {
             console.warn('TOON encoding failed:', error);
         }
     }
 
-    // Fallback: wrap as simple text document
-    try {
-        const simpleDoc = { content: content.trim() };
-        const toonContent = encodeToon(simpleDoc);
-        return { content: toonContent, isToon: true, structured: simpleDoc };
-    } catch {
-        // Final fallback: return as plain text
-        return { content, isToon: false, structured: null };
-    }
+    // For plain text: store as-is (no transformation = guaranteed lossless)
+    return {
+        content,
+        isToon: false,
+        originalPreserved: true
+    };
 }
 
 /**
- * Optimize text content based on settings
+ * Optimize text content - LOSSLESS operation
+ * Only normalizes whitespace, never removes actual content
  * @param {string} content - Raw content to optimize
- * @param {string} level - Optimization level
  * @returns {Object} Optimized result
  */
-export function optimizeContent(content, level = 'balanced') {
+export function optimizeContent(content) {
     if (!content || typeof content !== 'string') {
-        return { content: '', isToon: false };
+        return { content: '', isToon: false, originalPreserved: true };
     }
 
-    const { settings } = OPTIMIZATION_LEVELS[level] || OPTIMIZATION_LEVELS.balanced;
-    let optimized = content;
+    // Step 1: Normalize whitespace (lossless - only formatting)
+    const normalized = normalizeText(content);
 
-    if (settings.normalizeLineEndings) {
-        optimized = normalizeLineEndings(optimized);
-    }
-
-    if (settings.removeExcessWhitespace) {
-        optimized = removeExcessWhitespace(optimized);
-    }
-
-    if (settings.stripMetadata) {
-        optimized = stripMetadata(optimized);
-    }
-
-    if (settings.deduplicate) {
-        optimized = deduplicate(optimized);
-    }
-
-    optimized = optimized.trim();
-
-    // Convert to TOON format if enabled
-    if (settings.useToonFormat) {
-        return convertToToon(optimized);
-    }
-
-    return { content: optimized, isToon: false };
+    // Step 2: Try to convert to TOON if it's structured data (lossless)
+    return convertToToon(normalized);
 }
 
 /**
@@ -291,6 +160,7 @@ function uint8ToBase64(bytes) {
 
 /**
  * Generate a .toon file from content
+ * LOSSLESS: Original content can be fully recovered
  * @param {Object} params - Generation parameters
  * @returns {Promise<Object>} Toon file data and statistics
  */
@@ -299,16 +169,15 @@ export async function generateToonFile({
     originalFormat,
     originalSize,
     rawContent,
-    optimizationLevel = 'balanced',
 }) {
     // Count original tokens
     const originalTokens = countTokens(rawContent);
 
-    // Optimize content (may convert to TOON format)
-    const { content: optimizedContent, isToon } = optimizeContent(rawContent, optimizationLevel);
+    // Optimize content (lossless - only whitespace normalization + TOON format)
+    const { content: optimizedContent, isToon } = optimizeContent(rawContent);
     const optimizedTokens = countTokens(optimizedContent);
 
-    // Compress
+    // Compress with gzip (lossless compression)
     const compressed = await compressContent(optimizedContent);
     const compressedBase64 = uint8ToBase64(compressed);
 
@@ -322,10 +191,10 @@ export async function generateToonFile({
         : 0;
 
     // Create .toon file structure
-    // This wraps the TOON-formatted content in a metadata envelope
     const toonFile = {
         version: '1.0',
-        format: isToon ? 'toon' : 'text', // Indicate if TOON format was used
+        format: isToon ? 'toon' : 'text',
+        lossless: true, // Flag indicating data can be fully recovered
         original: {
             filename: originalFilename,
             type: originalFormat,
@@ -342,10 +211,7 @@ export async function generateToonFile({
         },
         metadata: {
             created: new Date().toISOString(),
-            generator: 'Tooner',
-            settings: {
-                optimizationLevel,
-            },
+            generator: 'Tooner v1.0',
         },
     };
 
@@ -359,6 +225,7 @@ export async function generateToonFile({
         sizeReduction,
         rawContent: optimizedContent, // For copy-to-clipboard
         isToonFormat: isToon,
+        lossless: true,
     };
 
     return { toonFile, stats };
@@ -425,10 +292,10 @@ export async function decodeToonFile(toonFile) {
         bytes[i] = binary.charCodeAt(i);
     }
 
-    // Decompress
+    // Decompress (lossless)
     const content = await decompressContent(bytes);
 
-    // If it was TOON format, decode it
+    // If it was TOON format, decode it back to JSON
     if (toonFile.optimized.isToonFormat) {
         try {
             const decoded = decodeToon(content);

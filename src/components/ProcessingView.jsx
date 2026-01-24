@@ -4,13 +4,12 @@ import gsap from 'gsap';
 import { formatSize } from '../utils/tokenizer';
 
 /**
- * ProcessingView component - Shows progress while processing file
+ * Processing view with spacious layout
  */
 export default function ProcessingView({ file, progress, onCancel }) {
     const containerRef = useRef(null);
     const progressRef = useRef(null);
 
-    // GSAP entrance animation
     useEffect(() => {
         const ctx = gsap.context(() => {
             gsap.fromTo(
@@ -22,7 +21,6 @@ export default function ProcessingView({ file, progress, onCancel }) {
         return () => ctx.revert();
     }, []);
 
-    // Pulse animation on progress update
     useEffect(() => {
         if (progressRef.current && progress > 0) {
             gsap.fromTo(
@@ -31,7 +29,7 @@ export default function ProcessingView({ file, progress, onCancel }) {
                 { scale: 1.02, duration: 0.15, yoyo: true, repeat: 1, ease: 'power2.inOut' }
             );
         }
-    }, [Math.floor(progress / 10)]); // Pulse every 10%
+    }, [Math.floor(progress / 10)]);
 
     const statusMessages = [
         { threshold: 0, message: 'Initializing...' },
@@ -50,13 +48,12 @@ export default function ProcessingView({ file, progress, onCancel }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-4"
+            className="flex flex-col items-center justify-center min-h-[calc(100vh-6rem)] px-6 py-12"
         >
-            <div ref={containerRef} className="card w-full max-w-sm sm:max-w-md text-center p-6 sm:p-8">
+            <div ref={containerRef} className="card w-full max-w-md text-center p-8 sm:p-10">
                 {/* Animated loader */}
-                <div ref={progressRef} className="w-24 h-24 sm:w-28 sm:h-28 mx-auto mb-6 relative">
+                <div ref={progressRef} className="w-28 h-28 sm:w-32 sm:h-32 mx-auto mb-8 relative">
                     <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                        {/* Background circle */}
                         <circle
                             cx="50"
                             cy="50"
@@ -65,7 +62,6 @@ export default function ProcessingView({ file, progress, onCancel }) {
                             stroke="var(--bg-tertiary)"
                             strokeWidth="6"
                         />
-                        {/* Progress circle */}
                         <motion.circle
                             cx="50"
                             cy="50"
@@ -87,27 +83,26 @@ export default function ProcessingView({ file, progress, onCancel }) {
                         </defs>
                     </svg>
 
-                    {/* Percentage in center */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-2xl sm:text-3xl font-bold text-[--text-primary] mono">
+                        <span className="text-3xl sm:text-4xl font-bold text-[--text-primary] mono">
                             {Math.round(progress)}%
                         </span>
                     </div>
                 </div>
 
                 {/* File info */}
-                <h3 className="text-lg sm:text-xl font-semibold text-[--text-primary] mb-2">
+                <h3 className="text-xl sm:text-2xl font-semibold text-[--text-primary] mb-3">
                     Toonifying...
                 </h3>
-                <p className="text-[--text-secondary] text-sm mb-1 truncate max-w-full px-4">
+                <p className="text-[--text-secondary] text-sm sm:text-base mb-2 truncate max-w-full px-4">
                     {file.name}
                 </p>
-                <p className="text-[--text-muted] text-xs mb-6">
+                <p className="text-[--text-muted] text-sm mb-8">
                     {formatSize(file.size)}
                 </p>
 
                 {/* Progress bar */}
-                <div className="progress-bar mb-4">
+                <div className="progress-bar mb-5">
                     <motion.div
                         className="progress-bar-fill"
                         animate={{ width: `${progress}%` }}
@@ -120,7 +115,7 @@ export default function ProcessingView({ file, progress, onCancel }) {
                     key={currentStatus}
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-[--text-secondary] text-sm mb-6 h-5"
+                    className="text-[--text-secondary] text-sm mb-8 h-5"
                 >
                     {currentStatus}
                 </motion.p>
@@ -130,7 +125,7 @@ export default function ProcessingView({ file, progress, onCancel }) {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={onCancel}
-                    className="btn btn-secondary text-sm"
+                    className="btn btn-secondary"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -144,9 +139,9 @@ export default function ProcessingView({ file, progress, onCancel }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="mt-6 text-[--text-muted] text-xs flex items-center gap-2"
+                className="mt-8 text-[--text-muted] text-sm flex items-center gap-2"
             >
-                <svg className="w-3.5 h-3.5 text-[--success]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-[--success]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -154,7 +149,7 @@ export default function ProcessingView({ file, progress, onCancel }) {
                         d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                     />
                 </svg>
-                Processing locally in your browser
+                100% local — nothing leaves your browser
             </motion.p>
         </motion.div>
     );
