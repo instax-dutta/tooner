@@ -98,6 +98,44 @@ body {
   min-height: 100dvh;
   overflow-x: hidden;
   position: relative;
+  /* Prevent overscroll white flash on mobile */
+  overscroll-behavior-y: none;
+}
+
+/* =============================================================================
+   GLOBAL POLISH (Scrollbars, Selection, Focus)
+   ============================================================================= */
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Text Selection */
+::selection {
+  background: var(--neon-purple);
+  color: #fff;
+  text-shadow: none;
+}
+
+/* Focus Outline */
+:focus-visible {
+  outline: 2px solid var(--neon-cyan);
+  outline-offset: 2px;
 }
 
 /* Animated gradient background */

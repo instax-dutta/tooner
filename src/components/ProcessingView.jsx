@@ -61,9 +61,9 @@ export default function ProcessingView({ file, progress, onCancel }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex flex-col items-center justify-center min-h-[calc(100vh-5rem)] px-6"
+            className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 sm:py-24"
         >
-            <div ref={containerRef} className="glass-card w-full max-w-md text-center p-10 sm:p-12">
+            <div ref={containerRef} className="glass-card w-full max-w-sm sm:max-w-md text-center p-8 sm:p-10 mb-8 sm:mb-10">
                 {/* Animated loader */}
                 <div className="relative w-36 h-36 sm:w-40 sm:h-40 mx-auto mb-10">
                     {/* Background glow */}
@@ -172,12 +172,12 @@ export default function ProcessingView({ file, progress, onCancel }) {
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={onCancel}
-                    className="btn btn-secondary"
+                    className="btn btn-secondary w-full py-3.5 text-sm font-semibold"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                    Cancel
+                    Cancel Processing
                 </motion.button>
             </div>
 
@@ -186,11 +186,11 @@ export default function ProcessingView({ file, progress, onCancel }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="mt-10 flex items-center gap-3 text-sm"
+                className="flex items-center gap-3 text-sm"
             >
                 <div className="w-2 h-2 rounded-full bg-[--neon-green] animate-pulse shadow-[0_0_10px_var(--glow-green)]" />
-                <span className="text-[--text-muted]">Processing locally in your browser</span>
+                <span className="text-[--text-muted] font-medium">Processing locally in your browser</span>
             </motion.div>
-        </motion.div>
+        </motion.div> >
     );
 }
