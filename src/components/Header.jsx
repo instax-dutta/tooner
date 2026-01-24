@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import gsap from 'gsap';
 
 /**
- * Slim, modern header with neon accents
+ * Minimal, clean header
  */
 export default function Header() {
     const logoRef = useRef(null);
@@ -28,8 +28,8 @@ export default function Header() {
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="fixed top-0 left-0 right-0 z-50 glass-strong"
         >
-            <div className="container h-14 sm:h-16 flex items-center justify-between">
-                {/* Logo */}
+            <div className="container h-14 sm:h-16 flex items-center justify-center">
+                {/* Logo - Centered */}
                 <motion.a
                     href="https://tooner.sdad.pro"
                     className="flex items-center gap-2.5 sm:gap-3 group"
@@ -43,28 +43,10 @@ export default function Header() {
                     >
                         <span className="text-base sm:text-lg font-bold text-[--bg-deep]">T</span>
                     </div>
-                    <div className="hidden xs:flex flex-col">
-                        <span className="text-base sm:text-lg font-semibold tracking-tight text-[--text-primary] leading-tight">
-                            Tooner
-                        </span>
-                        <span className="text-[9px] text-[--text-muted] tracking-[0.2em] uppercase leading-none">
-                            Token Engine
-                        </span>
-                    </div>
-                    <span className="xs:hidden text-base font-semibold text-[--text-primary]">Tooner</span>
+                    <span className="text-base sm:text-lg font-semibold tracking-tight text-[--text-primary]">
+                        Tooner
+                    </span>
                 </motion.a>
-
-                {/* Privacy Badge */}
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-full 
-                     bg-[--neon-green]/10 border border-[--neon-green]/30"
-                >
-                    <div className="w-1.5 h-1.5 rounded-full bg-[--neon-green] animate-pulse" />
-                    <span className="text-xs font-medium text-[--neon-green]">Local</span>
-                </motion.div>
             </div>
         </motion.header>
     );
