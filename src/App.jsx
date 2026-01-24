@@ -127,21 +127,24 @@ function App() {
           )}
 
           {state === 'error' && (
-            <div key="error" className="flex flex-col items-center justify-center min-h-[calc(100vh-6rem)] px-6">
-              <div className="glass-card max-w-md w-full p-10 text-center">
-                <div className="w-20 h-20 rounded-full bg-[--error]/10 border border-[--error]/30 
+            <div key="error" className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 sm:py-24">
+              <div className="glass-card max-w-sm sm:max-w-md w-full p-8 sm:p-10 text-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[--error]/10 border border-[--error]/20 
                                flex items-center justify-center mx-auto mb-8
-                               shadow-[0_0_40px_rgba(255,69,58,0.3)]">
-                  <svg className="w-10 h-10 text-[--error]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                               shadow-[0_0_30px_rgba(255,69,58,0.15)]">
+                  <svg className="w-8 h-8 sm:w-10 sm:h-10 text-[--error]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-[--text-primary] mb-4">
-                  Processing Failed
+                <h2 className="text-2xl sm:text-3xl font-black text-[--text-primary] mb-4">
+                  Failed
                 </h2>
-                <p className="text-[--text-secondary] mb-8 text-sm leading-relaxed">{error}</p>
-                <button onClick={handleReset} className="btn btn-primary w-full">
-                  Try Again
+                <p className="text-[--text-muted] mb-10 text-sm font-medium leading-relaxed">{error}</p>
+                <button
+                  onClick={handleReset}
+                  className="btn btn-primary w-full py-3.5 text-sm font-bold"
+                >
+                  Back to Upload
                 </button>
               </div>
             </div>
