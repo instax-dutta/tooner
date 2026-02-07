@@ -33,13 +33,7 @@ function App() {
         return () => lenis.destroy();
     }, []);
 
-    useEffect(() => {
-        gsap.fromTo(
-            'body',
-            { opacity: 0 },
-            { opacity: 1, duration: 0.6, ease: 'power2.out' }
-        );
-    }, []);
+
 
     const handleFileSelect = async (selectedFile) => {
         setFile(selectedFile);
