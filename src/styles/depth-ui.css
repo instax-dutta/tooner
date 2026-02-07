@@ -1,0 +1,48 @@
+:root {
+  --background: 0 0% 7%;
+  --foreground: 0 0% 90%;
+  --card: 0 0% 11%;
+  --card-foreground: 0 0% 88%;
+  --popover: 0 0% 11%;
+  --popover-foreground: 222 84% 88%;
+  --primary: 10 70% 55%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 200 30% 16%;
+  --secondary-foreground: 200 20% 85%;
+  --muted: 0 0% 14%;
+  --muted-foreground: 0 0% 55%;
+  --accent: 200 50% 50%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 18%;
+  --input: 0 0% 18%;
+  --ring: 10 70% 55%;
+  --radius: 0.5rem;
+  --font-sans: 'Space Grotesk', sans-serif;
+  --font-heading: 'Archivo Black', sans-serif;
+  --card-shadow: 0 4px 16px hsl(0 0% 0% / 0.3);
+  --card-backdrop: none;
+  --border-width: 1px;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}

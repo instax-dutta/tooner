@@ -1,68 +1,13 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import gsap from 'gsap';
 import { getAcceptedTypes, isSupported } from '../utils/fileProcessors';
 
-/**
- * Ultra-modern DropZone with cyberpunk aesthetics
- */
 export default function DropZone({ onFileSelect, isProcessing }) {
     const [isDragging, setIsDragging] = useState(false);
     const [error, setError] = useState(null);
     const [isHovering, setIsHovering] = useState(false);
     const fileInputRef = useRef(null);
     const dragCountRef = useRef(0);
-    const dropZoneRef = useRef(null);
-    const iconRef = useRef(null);
-    const titleRef = useRef(null);
-
-    // GSAP entrance animations
-    useEffect(() => {
-        const ctx = gsap.context(() => {
-            // Title reveal
-            gsap.fromTo(
-                titleRef.current,
-                { opacity: 0, y: 30, filter: 'blur(10px)' },
-                { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, delay: 0.2, ease: 'power3.out' }
-            );
-
-            // Drop zone scale in
-            gsap.fromTo(
-                dropZoneRef.current,
-                { opacity: 0, scale: 0.9, y: 40 },
-                { opacity: 1, scale: 1, y: 0, duration: 0.6, delay: 0.4, ease: 'back.out(1.5)' }
-            );
-
-            // Icon floating animation
-            gsap.to(iconRef.current, {
-                y: -12,
-                rotation: 5,
-                duration: 3,
-                repeat: -1,
-                yoyo: true,
-                ease: 'sine.inOut',
-            });
-        });
-
-        return () => ctx.revert();
-    }, []);
-
-    // Drag state animation
-    useEffect(() => {
-        if (isDragging && dropZoneRef.current) {
-            gsap.to(dropZoneRef.current, {
-                scale: 1.03,
-                duration: 0.3,
-                ease: 'power2.out',
-            });
-        } else if (dropZoneRef.current) {
-            gsap.to(dropZoneRef.current, {
-                scale: 1,
-                duration: 0.3,
-                ease: 'power2.out',
-            });
-        }
-    }, [isDragging]);
 
     const handleDragEnter = useCallback((e) => {
         e.preventDefault();
@@ -141,9 +86,9 @@ export default function DropZone({ onFileSelect, isProcessing }) {
         if (items) {
             for (const item of items) {
                 if (item.kind === 'file') {
-                    const file = item.getAsFile();
-                    if (file) {
-                        validateAndSelectFile(file);
+                    const itemFile = item.getAsFile();
+                    if (itemFile) {
+                        validateAndSelectFile(itemFile);
                         break;
                     }
                 }
@@ -164,28 +109,44 @@ export default function DropZone({ onFileSelect, isProcessing }) {
             transition={{ duration: 0.5 }}
             className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-8 sm:py-12"
         >
-            {/* Hero Text */}
-            <div ref={titleRef} className="text-center mb-8 sm:mb-12 md:mb-16">
+            <motion.div
+                initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }} // Updated easing to resemble power3.out
+                className="text-center mb-8 sm:mb-12 md:mb-16"
+            >
                 <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4 sm:mb-6 leading-tight tracking-tight">
                     <span className="neon-text">Toonify</span>
                     <br />
-                    <span className="text-[--text-primary]">Your Docs</span>
+                    <span className="text-foreground">Your Docs</span>
                 </h1>
-                <p className="text-[--text-secondary] text-sm xs:text-base sm:text-lg max-w-md sm:max-w-xl mx-auto leading-relaxed px-2">
-                    Convert to token-optimized <span className="text-[--neon-cyan] font-mono text-xs sm:text-sm">.toon</span> files
+                <p className="text-muted-foreground text-sm xs:text-base sm:text-lg max-w-md sm:max-w-xl mx-auto leading-relaxed px-2">
+                    Convert to token-optimized <span className="font-mono text-xs sm:text-sm">.toon</span> files
                     <br className="hidden xs:block" />
                     <span className="xs:inline hidden"> — </span>
-                    <span className="text-[--neon-green] font-medium">100% lossless</span>
+                    <span className="text-green-500 font-medium">100% lossless</span>
                 </p>
-            </div>
+            </motion.div>
 
-            {/* Drop Zone */}
-            <div
-                ref={dropZoneRef}
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 40, rotateX: -10 }}
+                animate={{
+                    opacity: 1,
+                    scale: isDragging ? 1.02 : 1,
+                    y: 0,
+                    rotateX: 0,
+                    rotate: isDragging ? 2 : 0
+                }}
+                transition={{
+                    opacity: { duration: 0.6, delay: 0.4, ease: "backOut" }, // Use backOut (similar to back.out(1.5)) keyframe ease if available, or predefined ease
+                    scale: { duration: 0.3, ease: "easeOut" },
+                    rotate: { duration: 0.3, ease: "easeOut" },
+                    default: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
+                }}
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
                 className={`drop-zone w-full max-w-lg sm:max-w-xl md:max-w-2xl aspect-[1.8/1] sm:aspect-[2/1]
-                    flex flex-col items-center justify-center relative
+                    flex flex-col items-center justify-center relative select-none outline-none
                     ${isDragging ? 'dragging' : ''}
                     ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
                 onClick={handleClick}
@@ -198,23 +159,30 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                 onKeyDown={(e) => e.key === 'Enter' && handleClick()}
                 aria-label="Upload file"
             >
-                {/* Ambient glow effect */}
                 <div className={`absolute inset-0 transition-opacity duration-700 pointer-events-none rounded-2xl
                         ${isDragging || isHovering ? 'opacity-100' : 'opacity-0'}`}>
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--glow-cyan)_0%,_transparent_60%)] opacity-40" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent opacity-40" />
                 </div>
 
-                {/* Icon */}
-                <div ref={iconRef} className="mb-4 sm:mb-6">
+                <div className="mb-4 sm:mb-6">
                     <motion.div
-                        animate={isDragging ? { scale: 1.2, rotate: 10 } : { scale: 1 }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                        animate={isDragging ? { scale: 1.2, rotate: 10 } : {
+                            scale: 1,
+                            rotate: [5, -5, 5],
+                            y: [-12, 0, -12]
+                        }}
+                        transition={isDragging ? { type: 'spring', stiffness: 300, damping: 20 } : {
+                            duration: 3,
+                            repeat: Infinity,
+                            repeatType: "reverse",
+                            ease: "easeInOut"
+                        }}
                     >
                         <svg
                             className={`w-14 h-14 sm:w-18 sm:h-18 md:w-20 md:h-20 transition-all duration-300
-                         ${isDragging ? 'text-[--neon-cyan] drop-shadow-[0_0_20px_var(--glow-cyan)]'
-                                    : isHovering ? 'text-[--neon-purple]'
-                                        : 'text-[--text-muted]'}`}
+                          ${isDragging ? 'text-primary drop-shadow-[0_0_20px_rgba(60,100,255,0.4)]'
+                                    : isHovering ? 'text-accent'
+                                        : 'text-muted-foreground'}`}
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -229,7 +197,6 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                     </motion.div>
                 </div>
 
-                {/* Text */}
                 <div className="text-center z-10 px-4 sm:px-6">
                     <motion.h2
                         className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3"
@@ -238,22 +205,21 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                         {isDragging ? (
                             <span className="neon-text">Release to toonify!</span>
                         ) : (
-                            <span className="text-[--text-primary]">Drop your file here</span>
+                            <span className="text-foreground">Drop your file here</span>
                         )}
                     </motion.h2>
-                    <p className="text-[--text-secondary] text-sm sm:text-base">
+                    <p className="text-muted-foreground text-sm sm:text-base">
                         or{' '}
-                        <span className="text-[--neon-cyan] hover:text-[--neon-purple] underline decoration-dotted 
-                           underline-offset-4 cursor-pointer transition-colors">
+                        <span className="text-primary hover:text-accent underline decoration-dotted 
+                            underline-offset-4 cursor-pointer transition-colors">
                             browse
                         </span>
                         <span className="hidden xs:inline">{' '}•{' '}
-                            <kbd className="px-1.5 py-0.5 bg-[--bg-elevated] border border-[--glass-border] rounded 
-                           text-[10px] font-mono text-[--text-muted]">⌘V</kbd></span>
+                            <kbd className="px-1.5 py-0.5 bg-card border border-border rounded 
+                            text-[10px] font-mono text-muted">⌘V</kbd></span>
                     </p>
                 </div>
 
-                {/* Hidden input */}
                 <input
                     ref={fileInputRef}
                     type="file"
@@ -263,31 +229,29 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                     aria-label="File upload"
                 />
 
-                {/* Cyber corners */}
                 <div className={`absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 rounded-tl-xl
                         transition-colors duration-300
-                        ${isDragging ? 'border-[--neon-cyan]' : 'border-[--glass-border]'}`} />
+                        ${isDragging ? 'border-primary' : 'border-border'}`} />
                 <div className={`absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 rounded-tr-xl
                         transition-colors duration-300
-                        ${isDragging ? 'border-[--neon-purple]' : 'border-[--glass-border]'}`} />
+                        ${isDragging ? 'border-accent' : 'border-border'}`} />
                 <div className={`absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 rounded-bl-xl
                         transition-colors duration-300
-                        ${isDragging ? 'border-[--neon-purple]' : 'border-[--glass-border]'}`} />
+                        ${isDragging ? 'border-accent' : 'border-border'}`} />
                 <div className={`absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 rounded-br-xl
                         transition-colors duration-300
-                        ${isDragging ? 'border-[--neon-pink]' : 'border-[--glass-border]'}`} />
-            </div>
+                        ${isDragging ? 'border-primary' : 'border-border'}`} />
+            </motion.div>
 
-            {/* Error */}
             <AnimatePresence>
                 {error && (
                     <motion.div
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="mt-8 px-6 py-4 bg-[--error]/10 border border-[--error]/30 
-                       rounded-2xl text-[--error] text-sm flex items-center gap-3
-                       shadow-[0_0_20px_rgba(255,69,58,0.2)]"
+                        exit={{ opacity: 0, y: 10, scale: 1 }} // Keeping scale same on exit to prevent weird shrink
+                        className="mt-8 px-6 py-4 bg-destructive/10 border border-destructive/30 
+                        rounded-2xl text-destructive text-sm flex items-center gap-3
+                        shadow-[0_0_20px_rgba(255,69,58,0.2)]"
                     >
                         <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -298,20 +262,18 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                 )}
             </AnimatePresence>
 
-            {/* Supported formats */}
             <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
-                className="mt-12 text-[--text-muted] text-sm"
+                className="mt-12 text-muted-foreground text-sm"
             >
                 Supports{' '}
-                <span className="text-[--text-secondary]">PDF, DOCX, Excel, CSV, JSON, Markdown</span>
+                <span className="text-secondary">PDF, DOCX, Excel, CSV, JSON, Markdown</span>
                 {' '}+{' '}
-                <span className="text-[--neon-cyan]">30 more</span>
+                <span className="text-primary">30 more</span>
             </motion.p>
 
-            {/* Footer */}
             <motion.a
                 href="https://sdad.pro"
                 target="_blank"
@@ -319,7 +281,7 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1 }}
-                className="mt-16 text-sm text-[--text-muted] hover:text-[--neon-purple] transition-colors"
+                className="mt-16 text-sm text-muted-foreground hover:text-accent transition-colors"
             >
                 Built by sdad.pro
             </motion.a>

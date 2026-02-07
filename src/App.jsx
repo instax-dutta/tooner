@@ -9,150 +9,145 @@ import ResultsView from './components/ResultsView';
 import { processFile } from './utils/fileProcessors';
 import { generateToonFile } from './utils/tokenizer';
 
-/**
- * Tooner - Cyberpunk Document Tokenization
- */
 function App() {
-  const [state, setState] = useState('idle');
-  const [file, setFile] = useState(null);
-  const [progress, setProgress] = useState(0);
-  const [results, setResults] = useState(null);
-  const [error, setError] = useState(null);
+    const [state, setState] = useState('idle');
+    const [file, setFile] = useState(null);
+    const [progress, setProgress] = useState(0);
+    const [results, setResults] = useState(null);
+    const [error, setError] = useState(null);
 
-  // Lenis smooth scroll
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.4,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      smoothWheel: true,
-    });
+    useEffect(() => {
+        const lenis = new Lenis({
+            duration: 1.4,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: 'vertical',
+            smoothWheel: true,
+        });
 
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
 
-    return () => lenis.destroy();
-  }, []);
+        return () => lenis.destroy();
+    }, []);
 
-  // GSAP page entrance
-  useEffect(() => {
-    gsap.fromTo(
-      'body',
-      { opacity: 0 },
-      { opacity: 1, duration: 0.6, ease: 'power2.out' }
+    useEffect(() => {
+        gsap.fromTo(
+            'body',
+            { opacity: 0 },
+            { opacity: 1, duration: 0.6, ease: 'power2.out' }
+        );
+    }, []);
+
+    const handleFileSelect = async (selectedFile) => {
+        setFile(selectedFile);
+        setState('processing');
+        setProgress(0);
+        setError(null);
+
+        try {
+            const { content, format } = await processFile(selectedFile, (p) => {
+                setProgress(p * 0.6);
+            });
+
+            setProgress(70);
+
+            const { toonFile, stats } = await generateToonFile({
+                originalFilename: selectedFile.name,
+                originalFormat: format,
+                originalSize: selectedFile.size,
+                rawContent: content,
+            });
+
+            setProgress(100);
+            await new Promise((r) => setTimeout(r, 400));
+
+            setResults({ toonFile, stats });
+            setState('done');
+        } catch (err) {
+            console.error('Processing error:', err);
+            setError(err.message);
+            setState('error');
+        }
+    };
+
+    const handleCancel = () => {
+        setState('idle');
+        setFile(null);
+        setProgress(0);
+        setError(null);
+    };
+
+    const handleReset = () => {
+        setState('idle');
+        setFile(null);
+        setProgress(0);
+        setResults(null);
+        setError(null);
+    };
+
+    return (
+        <div className="min-h-screen min-h-dvh relative overflow-hidden">
+            <Header />
+
+            <main className="pt-20 sm:pt-24">
+                <AnimatePresence mode="wait">
+                    {state === 'idle' && (
+                        <DropZone
+                            key="dropzone"
+                            onFileSelect={handleFileSelect}
+                            isProcessing={false}
+                        />
+                    )}
+
+                    {state === 'processing' && (
+                        <ProcessingView
+                            key="processing"
+                            file={file}
+                            progress={progress}
+                            onCancel={handleCancel}
+                        />
+                    )}
+
+                    {state === 'done' && results && (
+                        <ResultsView
+                            key="results"
+                            file={file}
+                            stats={results.stats}
+                            toonFile={results.toonFile}
+                            onReset={handleReset}
+                        />
+                    )}
+
+                    {state === 'error' && (
+                        <div key="error" className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 sm:py-24">
+                            <div className="glass-card max-w-sm sm:max-w-md w-full p-8 sm:p-10 text-center">
+                                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-destructive/10 border border-destructive/20 
+                                    flex items-center justify-center mx-auto mb-8
+                                    shadow-[0_0_30px_rgba(255,69,58,0.15)]">
+                                    <svg className="w-8 h-8 sm:w-10 sm:h-10 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </div>
+                                <h2 className="text-2xl sm:text-3xl font-black text-foreground mb-4">
+                                    Failed
+                                </h2>
+                                <p className="text-muted-foreground mb-10 text-sm font-medium leading-relaxed">{error}</p>
+                                <button
+                                    onClick={handleReset}
+                                    className="btn btn-primary w-full py-3.5 text-sm font-bold"
+                                >
+                                    Back to Upload
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </AnimatePresence>
+            </main>
+        </div>
     );
-  }, []);
-
-  const handleFileSelect = async (selectedFile) => {
-    setFile(selectedFile);
-    setState('processing');
-    setProgress(0);
-    setError(null);
-
-    try {
-      const { content, format } = await processFile(selectedFile, (p) => {
-        setProgress(p * 0.6);
-      });
-
-      setProgress(70);
-
-      const { toonFile, stats } = await generateToonFile({
-        originalFilename: selectedFile.name,
-        originalFormat: format,
-        originalSize: selectedFile.size,
-        rawContent: content,
-      });
-
-      setProgress(100);
-      await new Promise((r) => setTimeout(r, 400));
-
-      setResults({ toonFile, stats });
-      setState('done');
-    } catch (err) {
-      console.error('Processing error:', err);
-      setError(err.message);
-      setState('error');
-    }
-  };
-
-  const handleCancel = () => {
-    setState('idle');
-    setFile(null);
-    setProgress(0);
-    setError(null);
-  };
-
-  const handleReset = () => {
-    setState('idle');
-    setFile(null);
-    setProgress(0);
-    setResults(null);
-    setError(null);
-  };
-
-  return (
-    <div className="min-h-screen min-h-dvh relative overflow-hidden">
-      <Header />
-
-      <main className="pt-14 sm:pt-16">
-        <AnimatePresence mode="wait">
-          {state === 'idle' && (
-            <DropZone
-              key="dropzone"
-              onFileSelect={handleFileSelect}
-              isProcessing={false}
-            />
-          )}
-
-          {state === 'processing' && (
-            <ProcessingView
-              key="processing"
-              file={file}
-              progress={progress}
-              onCancel={handleCancel}
-            />
-          )}
-
-          {state === 'done' && results && (
-            <ResultsView
-              key="results"
-              file={file}
-              stats={results.stats}
-              toonFile={results.toonFile}
-              onReset={handleReset}
-            />
-          )}
-
-          {state === 'error' && (
-            <div key="error" className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 sm:py-24">
-              <div className="glass-card max-w-sm sm:max-w-md w-full p-8 sm:p-10 text-center">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[--error]/10 border border-[--error]/20 
-                               flex items-center justify-center mx-auto mb-8
-                               shadow-[0_0_30px_rgba(255,69,58,0.15)]">
-                  <svg className="w-8 h-8 sm:w-10 sm:h-10 text-[--error]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </div>
-                <h2 className="text-2xl sm:text-3xl font-black text-[--text-primary] mb-4">
-                  Failed
-                </h2>
-                <p className="text-[--text-muted] mb-10 text-sm font-medium leading-relaxed">{error}</p>
-                <button
-                  onClick={handleReset}
-                  className="btn btn-primary w-full py-3.5 text-sm font-bold"
-                >
-                  Back to Upload
-                </button>
-              </div>
-            </div>
-          )}
-        </AnimatePresence>
-      </main>
-    </div>
-  );
 }
 
 export default App;

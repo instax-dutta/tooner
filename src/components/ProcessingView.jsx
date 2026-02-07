@@ -3,25 +3,19 @@ import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { formatSize } from '../utils/tokenizer';
 
-/**
- * Cyberpunk processing view with neon effects
- */
 export default function ProcessingView({ file, progress, onCancel }) {
     const containerRef = useRef(null);
     const ringRef = useRef(null);
     const glowRef = useRef(null);
 
-    // GSAP animations
     useEffect(() => {
         const ctx = gsap.context(() => {
-            // Container entrance
             gsap.fromTo(
                 containerRef.current,
                 { scale: 0.8, opacity: 0, filter: 'blur(20px)' },
                 { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 0.6, ease: 'power3.out' }
             );
 
-            // Pulsing glow
             gsap.to(glowRef.current, {
                 opacity: 0.8,
                 scale: 1.1,
@@ -31,7 +25,6 @@ export default function ProcessingView({ file, progress, onCancel }) {
                 ease: 'sine.inOut',
             });
 
-            // Ring rotation
             gsap.to(ringRef.current, {
                 rotation: 360,
                 duration: 20,
@@ -64,15 +57,12 @@ export default function ProcessingView({ file, progress, onCancel }) {
             className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 sm:py-24"
         >
             <div ref={containerRef} className="glass-card w-full max-w-sm sm:max-w-md text-center p-8 sm:p-10 mb-8 sm:mb-10">
-                {/* Animated loader */}
                 <div className="relative w-36 h-36 sm:w-40 sm:h-40 mx-auto mb-10">
-                    {/* Background glow */}
                     <div
                         ref={glowRef}
-                        className="absolute inset-0 bg-[radial-gradient(circle,_var(--glow-cyan)_0%,_transparent_70%)] opacity-50"
+                        className="absolute inset-0 bg-gradient-to-b from-primary/20 to-transparent opacity-50"
                     />
 
-                    {/* Outer rotating ring */}
                     <svg
                         ref={ringRef}
                         className="absolute inset-0 w-full h-full"
@@ -80,9 +70,9 @@ export default function ProcessingView({ file, progress, onCancel }) {
                     >
                         <defs>
                             <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stopColor="var(--neon-cyan)" stopOpacity="1" />
-                                <stop offset="50%" stopColor="var(--neon-purple)" stopOpacity="0.5" />
-                                <stop offset="100%" stopColor="var(--neon-pink)" stopOpacity="0" />
+                                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="1" />
+                                <stop offset="50%" stopColor="hsl(var(--accent))" stopOpacity="0.5" />
+                                <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
                             </linearGradient>
                         </defs>
                         <circle
@@ -96,14 +86,13 @@ export default function ProcessingView({ file, progress, onCancel }) {
                         />
                     </svg>
 
-                    {/* Progress circle */}
                     <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
                         <circle
                             cx="50"
                             cy="50"
                             r="40"
                             fill="none"
-                            stroke="var(--bg-tertiary)"
+                            stroke="hsl(var(--muted))"
                             strokeWidth="4"
                         />
                         <motion.circle
@@ -117,38 +106,35 @@ export default function ProcessingView({ file, progress, onCancel }) {
                             strokeDasharray={`${progress * 2.51} 251`}
                             animate={{ strokeDasharray: `${progress * 2.51} 251` }}
                             transition={{ duration: 0.4, ease: 'easeOut' }}
-                            style={{ filter: 'drop-shadow(0 0 8px var(--glow-cyan))' }}
+                            style={{ filter: 'drop-shadow(0 0 8px hsl(var(--primary) / 0.5))' }}
                         />
                         <defs>
                             <linearGradient id="progressGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stopColor="var(--neon-cyan)" />
-                                <stop offset="50%" stopColor="var(--neon-purple)" />
-                                <stop offset="100%" stopColor="var(--neon-pink)" />
+                                <stop offset="0%" stopColor="hsl(var(--primary))" />
+                                <stop offset="50%" stopColor="hsl(var(--accent))" />
+                                <stop offset="100%" stopColor="hsl(var(--primary))" />
                             </linearGradient>
                         </defs>
                     </svg>
 
-                    {/* Percentage */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                         <span className="text-4xl sm:text-5xl font-bold neon-text font-mono">
                             {Math.round(progress)}
                         </span>
-                        <span className="text-xs text-[--text-muted] tracking-widest">PERCENT</span>
+                        <span className="text-xs text-muted-foreground tracking-widest">PERCENT</span>
                     </div>
                 </div>
 
-                {/* File info */}
-                <h3 className="text-2xl sm:text-3xl font-bold text-[--text-primary] mb-3">
+                <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-3">
                     Toonifying<span className="animate-pulse">...</span>
                 </h3>
-                <p className="text-[--text-secondary] mb-1 truncate max-w-full font-mono text-sm">
+                <p className="text-secondary mb-1 truncate max-w-full font-mono text-sm">
                     {file.name}
                 </p>
-                <p className="text-[--text-muted] text-sm mb-8">
+                <p className="text-muted-foreground text-sm mb-8">
                     {formatSize(file.size)}
                 </p>
 
-                {/* Progress bar */}
                 <div className="progress-bar mb-6">
                     <motion.div
                         className="progress-bar-fill"
@@ -157,17 +143,15 @@ export default function ProcessingView({ file, progress, onCancel }) {
                     />
                 </div>
 
-                {/* Status */}
                 <motion.p
                     key={currentStatus}
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-[--neon-cyan] text-sm font-medium mb-8 h-5"
+                    className="text-primary text-sm font-medium mb-8 h-5"
                 >
                     {currentStatus}
                 </motion.p>
 
-                {/* Cancel */}
                 <motion.button
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
@@ -181,15 +165,14 @@ export default function ProcessingView({ file, progress, onCancel }) {
                 </motion.button>
             </div>
 
-            {/* Privacy */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
                 className="flex items-center gap-3 text-sm"
             >
-                <div className="w-2 h-2 rounded-full bg-[--neon-green] animate-pulse shadow-[0_0_10px_var(--glow-green)]" />
-                <span className="text-[--text-muted] font-medium">Processing locally in your browser</span>
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                <span className="text-muted-foreground font-medium">Processing locally in your browser</span>
             </motion.div>
         </motion.div>
     );
