@@ -117,21 +117,20 @@ function App() {
 
                     {state === 'error' && (
                         <div key="error" className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 sm:py-24">
-                            <div className="glass-card max-w-sm sm:max-w-md w-full p-8 sm:p-10 text-center">
+                            <div className="card max-w-sm sm:max-w-md w-full p-8 sm:p-10 text-center">
                                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-destructive/10 border border-destructive/20 
-                                    flex items-center justify-center mx-auto mb-8
-                                    shadow-[0_0_30px_rgba(255,69,58,0.15)]">
+                                    flex items-center justify-center mx-auto mb-8">
                                     <svg className="w-8 h-8 sm:w-10 sm:h-10 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                 </div>
-                                <h2 className="text-2xl sm:text-3xl font-black text-foreground mb-4">
+                                <h2 className="text-2xl sm:text-3xl font-medium text-foreground mb-4">
                                     Failed
                                 </h2>
-                                <p className="text-muted-foreground mb-10 text-sm font-medium leading-relaxed">{error}</p>
+                                <p className="text-muted-foreground mb-10 text-sm leading-relaxed">{error}</p>
                                 <button
                                     onClick={handleReset}
-                                    className="btn btn-primary w-full py-3.5 text-sm font-bold"
+                                    className="btn btn-primary w-full py-3.5 text-sm font-medium"
                                 >
                                     Back to Upload
                                 </button>
