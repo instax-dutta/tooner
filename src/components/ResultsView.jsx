@@ -94,12 +94,12 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex flex-col items-center justify-center h-full px-4 sm:px-6 py-6"
+            className="flex flex-col items-center justify-center min-h-full px-4 sm:px-6 py-4 sm:py-6 overflow-y-auto"
         >
-            <div ref={successRef} className="relative mb-4">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center
+            <div ref={successRef} className="relative mb-3 sm:mb-4">
+                <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full flex items-center justify-center
                     border-2 border-accent bg-accent/10 shadow-lg shadow-accent/20">
-                    <svg className="w-6 h-6 sm:w-7 sm:h-7 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:w-7 sm:h-7 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                 </div>
@@ -109,7 +109,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-2xl sm:text-3xl font-medium mb-2 text-center text-foreground"
+                className="text-xl sm:text-3xl font-medium mb-1.5 sm:mb-2 text-center text-foreground"
             >
                 {stats.tokenReduction > 0
                     ? `You saved ${stats.tokenReduction}% on tokens`
@@ -120,7 +120,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.15 }}
-                className="text-muted-foreground text-xs font-mono mb-4 text-center max-w-[80vw] truncate"
+                className="text-muted-foreground text-xs font-mono mb-3 sm:mb-4 text-center max-w-[80vw] truncate"
             >
                 {file.name}
             </motion.p>
@@ -130,7 +130,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className="card w-full max-w-sm sm:max-w-md p-4 sm:p-5 mb-4"
+                className="card w-full max-w-sm sm:max-w-md p-4 sm:p-5 mb-3 sm:mb-4"
             >
                 <StatRow
                     label="Size"
@@ -179,7 +179,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="flex flex-col sm:flex-row gap-2 w-full max-w-sm sm:max-w-md"
+                className="flex flex-col sm:flex-row gap-2 w-full max-w-sm sm:max-w-md flex-shrink-0"
             >
                 <motion.button
                     whileTap={{ scale: 0.98 }}
@@ -232,7 +232,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="mt-4 flex flex-col items-center gap-3"
+                className="mt-3 sm:mt-4 flex flex-col items-center gap-2 sm:gap-3"
             >
                 <motion.button
                     whileTap={{ scale: 0.98 }}

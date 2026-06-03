@@ -86,10 +86,10 @@ function App() {
     };
 
     return (
-        <div className="min-h-screen min-h-dvh relative overflow-hidden">
+        <div className="min-h-screen min-h-dvh relative">
             <Header />
 
-            <main className="h-[calc(100vh-4rem)] sm:h-[calc(100vh-4.5rem)]">
+            <main className="mt-[4.5rem] sm:mt-[5rem] h-[calc(100dvh-4.5rem)] sm:h-[calc(100dvh-5rem)] overflow-y-auto">
                 <AnimatePresence mode="wait">
                     {state === 'idle' && (
                         <DropZone
