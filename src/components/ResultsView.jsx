@@ -96,7 +96,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
             exit={{ opacity: 0 }}
             className="flex flex-col items-center justify-center h-full px-4 sm:px-6 py-6"
         >
-            <div ref={successRef} className="relative mb-3">
+            <div ref={successRef} className="relative mb-4">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center
                     border-2 border-accent bg-accent/10 shadow-lg shadow-accent/20">
                     <svg className="w-6 h-6 sm:w-7 sm:h-7 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +109,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="text-2xl sm:text-3xl font-medium mb-1 text-center text-foreground"
+                className="text-2xl sm:text-3xl font-medium mb-2 text-center text-foreground"
             >
                 {stats.tokenReduction > 0
                     ? `You saved ${stats.tokenReduction}% on tokens`
@@ -130,7 +130,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className="card w-full max-w-sm sm:max-w-md p-4 sm:p-5 mb-5"
+                className="card w-full max-w-sm sm:max-w-md p-4 sm:p-5 mb-4"
             >
                 <StatRow
                     label="Size"
@@ -232,7 +232,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="mt-5 flex flex-col items-center gap-3"
+                className="mt-4 flex flex-col items-center gap-3"
             >
                 <motion.button
                     whileTap={{ scale: 0.98 }}

@@ -138,7 +138,7 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-                className="text-center mb-4 sm:mb-6"
+                className="text-center mb-4"
             >
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-medium mb-2 leading-tight tracking-tight text-foreground">
                     Optimize any file for AI
@@ -163,7 +163,7 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                 initial={{ opacity: 0, scale: 0.97, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ duration: 0.45, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className={`drop-zone w-full max-w-lg aspect-[3/1] sm:aspect-[3.5/1]
+                className={`drop-zone w-full max-w-lg aspect-[2.5/1] sm:aspect-[3/1]
                     flex flex-col items-center justify-center relative select-none outline-none
                     ${isDragging ? 'dragging' : ''}
                     ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -255,7 +255,7 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="mt-4 sm:mt-5 flex flex-col items-center gap-3"
+                className="mt-4 flex flex-col items-center gap-3"
             >
                 <button
                     onClick={() => setShowFormats(!showFormats)}
@@ -306,7 +306,7 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="mt-5 flex flex-wrap items-center justify-center gap-4 text-[11px] text-muted-foreground"
+                className="mt-4 flex flex-wrap items-center justify-center gap-4 text-[11px] text-muted-foreground"
             >
                 <span className="flex items-center gap-1">
                     <svg className="w-3 h-3 text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">

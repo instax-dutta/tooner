@@ -20,8 +20,8 @@
   --input: 210 10% 18%;
   --ring: 210 8% 50%;
   --radius: 0.625rem;
-  --font-sans: Inter, system-ui, -apple-system, sans-serif;
-  --font-heading: Inter, system-ui, -apple-system, sans-serif;
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Space Grotesk', system-ui, -apple-system, sans-serif;
   --card-shadow: none;
   --card-backdrop: none;
   --border-width: 1px;

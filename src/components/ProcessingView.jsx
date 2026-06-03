@@ -47,7 +47,7 @@ export default function ProcessingView({ file, progress, onCancel }) {
                     initial={{ scale: 0.85, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.25 }}
-                    className="w-11 h-11 sm:w-13 sm:h-13 rounded-xl flex items-center justify-center
+                    className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center
                         bg-accent/10 border border-accent/20 mx-auto mb-4"
                 >
                     <svg className="w-5.5 h-5.5 sm:w-6 sm:h-6 text-accent" fill="none" stroke="currentColor"
@@ -56,7 +56,7 @@ export default function ProcessingView({ file, progress, onCancel }) {
                     </svg>
                 </motion.div>
 
-                <h3 className="text-xl sm:text-2xl font-medium text-foreground mb-1">
+                <h3 className="text-xl sm:text-2xl font-medium text-foreground mb-2">
                     Optimizing for LLMs
                     <span className="inline-flex ml-1">
                         <motion.span
@@ -74,14 +74,14 @@ export default function ProcessingView({ file, progress, onCancel }) {
                     </span>
                 </h3>
 
-                <p className="text-secondary-foreground mb-0.5 truncate max-w-full font-mono text-xs">
+                <p className="text-secondary-foreground mb-1 truncate max-w-full font-mono text-xs">
                     {file.name}
                 </p>
                 <p className="text-muted-foreground text-xs mb-5">
                     {formatSize(file.size)}
                 </p>
 
-                <div className="progress-bar mb-3">
+                <div className="progress-bar mb-4">
                     <motion.div
                         className="progress-bar-fill"
                         animate={{ width: `${progress}%` }}
@@ -96,7 +96,7 @@ export default function ProcessingView({ file, progress, onCancel }) {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -4 }}
                         transition={{ duration: 0.2 }}
-                        className="text-accent text-xs font-medium mb-5 h-4"
+                        className="text-accent text-xs font-medium mb-4 h-4"
                     >
                         {Math.round(progress)}% — {stage.message}
                     </motion.p>
