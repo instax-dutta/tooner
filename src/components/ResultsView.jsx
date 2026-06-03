@@ -5,29 +5,23 @@ import { formatSize, formatTokens, getToonFilename, createToonBlob } from '../ut
 
 function StatRow({ label, leftValue, leftSub, rightValue, rightSub, positive }) {
     return (
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
                 <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-0.5">{label}</div>
-                <div className="flex items-baseline gap-1.5">
-                    <span className="text-xl sm:text-2xl font-medium text-foreground font-mono tracking-tight stat-value">
-                        {leftValue}
-                    </span>
-                    <span className="text-[9px] text-muted-foreground uppercase tracking-wider">{leftSub}</span>
-                </div>
+                <span className="block text-lg sm:text-xl font-medium text-foreground font-mono tracking-tight">
+                    {leftValue}
+                </span>
+                <span className="text-[9px] text-muted-foreground uppercase tracking-wider">{leftSub}</span>
             </div>
-            <div className="flex-shrink-0">
-                <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-            </div>
-            <div className="flex-1 min-w-0">
-                <div className="h-3" />
-                <div className="flex items-baseline gap-1.5">
-                    <span className={`text-xl sm:text-2xl font-medium font-mono tracking-tight stat-value ${positive ? 'text-accent' : 'text-destructive'}`}>
-                        {rightValue}
-                    </span>
-                    <span className="text-[9px] text-muted-foreground uppercase tracking-wider">{rightSub}</span>
-                </div>
+            <svg className="w-4 h-4 text-muted-foreground mt-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+            <div className="flex-1 min-w-0 text-right">
+                <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-0.5 opacity-0">{label}</div>
+                <span className={`block text-lg sm:text-xl font-medium font-mono tracking-tight ${positive ? 'text-accent' : 'text-destructive'}`}>
+                    {rightValue}
+                </span>
+                <span className="text-[9px] text-muted-foreground uppercase tracking-wider">{rightSub}</span>
             </div>
         </div>
     );
@@ -136,7 +130,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className="card w-full max-w-sm sm:max-w-md p-4 sm:p-5 mb-4"
+                className="card w-full max-w-sm sm:max-w-md p-4 sm:p-5 mb-5"
             >
                 <StatRow
                     label="Size"
@@ -160,21 +154,21 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
 
                 <div className="my-3 border-t border-border" />
 
-                <div className="flex items-center justify-center gap-5">
+                <div className="flex items-center justify-center gap-6">
                     <div className="text-center">
-                        <span className={`text-2xl sm:text-3xl font-medium leading-none stat-value ${compressionPositive ? 'text-accent' : 'text-destructive'}`}>
+                        <span className={`text-xl sm:text-2xl font-medium leading-none ${compressionPositive ? 'text-accent' : 'text-destructive'}`}>
                             {compressionPositive ? `-${Math.abs(stats.sizeReduction)}%` : `+${Math.abs(stats.sizeReduction)}%`}
                         </span>
-                        <div className="text-[9px] text-muted-foreground uppercase tracking-wider mt-0.5">Size saved</div>
+                        <div className="text-[9px] text-muted-foreground uppercase tracking-wider mt-1">Size saved</div>
                     </div>
                     {stats.tokenReduction > 0 && (
                         <>
                             <div className="w-px h-8 bg-border" />
                             <div className="text-center">
-                                <span className="text-2xl sm:text-3xl font-medium leading-none text-accent stat-value">
+                                <span className="text-xl sm:text-2xl font-medium leading-none text-accent">
                                     -{stats.tokenReduction}%
                                 </span>
-                                <div className="text-[9px] text-muted-foreground uppercase tracking-wider mt-0.5">Tokens saved</div>
+                                <div className="text-[9px] text-muted-foreground uppercase tracking-wider mt-1">Tokens saved</div>
                             </div>
                         </>
                     )}
@@ -238,7 +232,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="mt-4 flex items-center justify-center gap-4"
+                className="mt-5 flex flex-col items-center gap-3"
             >
                 <motion.button
                     whileTap={{ scale: 0.98 }}
@@ -250,8 +244,6 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                     </svg>
                     Process Another
                 </motion.button>
-
-                <span className="w-px h-4 bg-border" />
 
                 <div className="flex items-center gap-1.5">
                     <span className="text-[9px] text-muted-foreground/50 uppercase tracking-widest mr-1">Feed to</span>
