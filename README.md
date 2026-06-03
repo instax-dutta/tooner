@@ -28,7 +28,6 @@
 - **Token-Optimized** — Reduce token count via smart content extraction + gzip compression.
 - **10+ Formats** — PDF, DOCX, XLSX, CSV, JSON, XML, Markdown, code files, and more.
 - **LLM-Ready Output** — `.toon` files work directly in ChatGPT, Claude, Gemini. Copy text or download.
-- **Cognitive UX** — Interface designed using Hick's Law, Peak-End Rule, Loss Aversion, Social Proof.
 - **Lazy-Loaded** — Heavy deps (PDF.js, SheetJS, Mammoth, gpt-tokenizer) load on demand.
 - **Dark Editorial UI** — Airtable-inspired palette with GSAP + Framer Motion animations, Lenis smooth scroll.
 
@@ -146,20 +145,6 @@ lenis        → lenis
 ```
 
 Main app bundle: ~217 KB (67 KB gzipped). All others load dynamically during processing.
-
-## Cognitive Psychology UX
-
-| Principle | Application |
-|-----------|-------------|
-| **Hick's Law** | Single CTA, unified stat card, reduced choice complexity |
-| **Peak-End Rule** | "You saved X%" as peak, LLM feed badges as satisfying end |
-| **Loss Aversion** | "Stop overpaying for bloated tokens" hero copy |
-| **Social Proof** | Live counter: "1,842 files optimized this week" |
-| **Availability Heuristic** | Concrete cost preview: "500-page PDF: ~$1.60 → ~$0.48" |
-| **JTBD** | "Optimize any file for AI" not "Toonify your docs" |
-| **Fitts's Law** | Large drop zone, generous touch targets, keyboard + paste support |
-| **Cognitive Load** | Single progress indicator, per-stage status icons |
-| **BJ Fogg Model** | Motivation (savings) × Ability (drag & drop) × Prompt ("see how much you save") |
 
 ## Deployment
 
