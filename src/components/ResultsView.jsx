@@ -1,20 +1,64 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
-import { formatSize, formatTokens, getToonFilename, createToonBlob } from '../utils/tokenizer';
+import { formatSize, formatTokens, getToonFilename, createToonBlob } from '../utils/format';
+
+function StatRow({ label, leftValue, leftSub, rightValue, rightSub, positive }) {
+    return (
+        <div className="flex items-center justify-between gap-6">
+            <div className="flex-1 min-w-0">
+                <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">{label}</div>
+                <div className="flex items-baseline gap-2">
+                    <span className="text-2xl sm:text-3xl font-medium text-foreground font-mono tracking-tight stat-value">
+                        {leftValue}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{leftSub}</span>
+                </div>
+            </div>
+            <div className="flex-shrink-0">
+                <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+                <div className="h-4" />
+                <div className="flex items-baseline gap-2">
+                    <span className={`text-2xl sm:text-3xl font-medium font-mono tracking-tight stat-value ${positive ? 'text-accent' : 'text-destructive'}`}>
+                        {rightValue}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{rightSub}</span>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 export default function ResultsView({ file, stats, toonFile, onReset }) {
     const [copied, setCopied] = useState(false);
     const [downloading, setDownloading] = useState(false);
     const containerRef = useRef(null);
     const successRef = useRef(null);
+    const cardRef = useRef(null);
 
     useEffect(() => {
         const ctx = gsap.context(() => {
             gsap.fromTo(
                 successRef.current,
                 { scale: 0, opacity: 0 },
-                { scale: 1, opacity: 1, duration: 0.5, ease: 'backOut(1.5)' }
+                { scale: 1, opacity: 1, duration: 0.5, ease: 'backOut(1.7)' }
+            );
+        });
+        return () => ctx.revert();
+    }, []);
+
+    useEffect(() => {
+        if (!cardRef.current) return;
+        const ctx = gsap.context(() => {
+            const values = cardRef.current.querySelectorAll('.stat-value');
+            gsap.fromTo(
+                values,
+                { opacity: 0, y: 12 },
+                { opacity: 1, y: 0, duration: 0.4, stagger: 0.08, ease: 'power2.out', delay: 0.3 }
             );
         });
         return () => ctx.revert();
@@ -23,7 +67,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
     const handleDownload = () => {
         setDownloading(true);
         try {
-            const blob = createToonBlob(toonFile, file.name);
+            const blob = createToonBlob(toonFile);
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -48,6 +92,8 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
         }
     };
 
+    const compressionPositive = stats.sizeReduction >= 0;
+
     return (
         <motion.div
             ref={containerRef}
@@ -58,13 +104,8 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
         >
             <div ref={successRef} className="relative mb-6 sm:mb-8">
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center
-                        border-2 border-accent bg-accent/10">
-                    <svg
-                        className="w-8 h-8 sm:w-10 sm:h-10 text-accent"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
+                    border-2 border-accent bg-accent/10 shadow-lg shadow-accent/20">
+                    <svg className="w-8 h-8 sm:w-10 sm:h-10 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                 </div>
@@ -76,81 +117,67 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                 transition={{ delay: 0.15 }}
                 className="text-4xl sm:text-5xl font-medium mb-2 text-center text-foreground"
             >
-                Toonified!
+                {stats.tokenReduction > 0
+                    ? `You saved ${stats.tokenReduction}% on tokens`
+                    : 'Optimized for AI'}
             </motion.h1>
 
             <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-muted-foreground text-sm sm:text-base font-mono mb-10 sm:mb-12 text-center max-w-[80vw] truncate"
+                className="text-muted-foreground text-sm sm:text-base font-mono mb-8 sm:mb-10 text-center max-w-[80vw] truncate"
             >
                 {file.name}
             </motion.p>
 
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                ref={cardRef}
+                initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 }}
-                className="card w-full max-w-sm sm:max-w-md p-6 sm:p-8 mb-6"
+                transition={{ delay: 0.25, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="card w-full max-w-sm sm:max-w-md p-6 sm:p-8 mb-8"
             >
-                <div className="flex flex-col text-center sm:text-left">
-                    <span className="text-muted-foreground text-[10px] font-medium uppercase tracking-[0.2em] mb-1">Compression</span>
-                    <div className="flex items-baseline gap-2 justify-center sm:justify-start w-full">
-                        <span className={`text-5xl sm:text-6xl font-medium leading-none ${stats.sizeReduction >= 0 ? 'text-accent' : 'text-destructive'}`}>
-                            {stats.sizeReduction >= 0 ? `-${Math.abs(stats.sizeReduction)}%` : `+${Math.abs(stats.sizeReduction)}%`}
-                        </span>
-                        <span className="text-muted-foreground font-medium text-sm">
-                            {stats.sizeReduction >= 0 ? 'smaller' : 'larger'}
-                        </span>
-                    </div>
-                </div>
+                <StatRow
+                    label="Size"
+                    leftValue={formatSize(stats.originalSize)}
+                    leftSub="Original"
+                    rightValue={formatSize(stats.compressedSize)}
+                    rightSub=".toon"
+                    positive={compressionPositive}
+                />
 
-                <div className="grid grid-cols-2 gap-3 mt-8">
-                    <div className="p-3 rounded-xl bg-background border border-border">
-                        <div className="text-xl sm:text-2xl font-medium text-foreground font-mono tracking-tight">
-                            {formatSize(stats.originalSize)}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">Original</div>
-                    </div>
-                    <div className={`p-3 rounded-xl border ${stats.sizeReduction >= 0 ? 'bg-accent/10 border-accent/20' : 'bg-destructive/10 border-destructive/20'}`}>
-                        <div className={`text-xl sm:text-2xl font-medium font-mono tracking-tight ${stats.sizeReduction >= 0 ? 'text-accent' : 'text-destructive'}`}>
-                            {formatSize(stats.compressedSize)}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">.toon</div>
-                    </div>
-                </div>
-            </motion.div>
+                <div className="my-6 border-t border-border" />
 
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="card w-full max-w-sm sm:max-w-md p-6 sm:p-8 mb-10"
-            >
-                <div className="flex flex-col text-center sm:text-left">
-                    <span className="text-muted-foreground text-[10px] font-medium uppercase tracking-[0.2em] mb-1">Tokens</span>
-                    <div className="flex items-baseline gap-2 justify-center sm:justify-start w-full">
-                        <span className="text-5xl sm:text-6xl font-medium leading-none text-accent">
-                            {stats.tokenReduction > 0 ? `-${stats.tokenReduction}%` : 'Fast'}
+                <StatRow
+                    label="Tokens"
+                    leftValue={formatTokens(stats.originalTokens)}
+                    leftSub="Raw"
+                    rightValue={formatTokens(stats.optimizedTokens)}
+                    rightSub="Optimized"
+                    positive={true}
+                />
+
+                <div className="my-6 border-t border-border" />
+
+                <div className="flex items-center justify-center gap-6">
+                    <div className="text-center">
+                        <span className={`text-3xl sm:text-4xl font-medium leading-none stat-value ${compressionPositive ? 'text-accent' : 'text-destructive'}`}>
+                            {compressionPositive ? `-${Math.abs(stats.sizeReduction)}%` : `+${Math.abs(stats.sizeReduction)}%`}
                         </span>
-                        {stats.tokenReduction > 0 && <span className="text-muted-foreground font-medium text-sm">saved</span>}
+                        <div className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">Size saved</div>
                     </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 mt-8">
-                    <div className="p-3 rounded-xl bg-background border border-border">
-                        <div className="text-xl sm:text-2xl font-medium text-foreground font-mono tracking-tight">
-                            {formatTokens(stats.originalTokens)}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">Raw</div>
-                    </div>
-                    <div className="p-3 rounded-xl bg-accent/10 border border-accent/20">
-                        <div className="text-xl sm:text-2xl font-medium text-accent font-mono tracking-tight">
-                            {formatTokens(stats.optimizedTokens)}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">Optimized</div>
-                    </div>
+                    {stats.tokenReduction > 0 && (
+                        <>
+                            <div className="w-px h-10 bg-border" />
+                            <div className="text-center">
+                                <span className="text-3xl sm:text-4xl font-medium leading-none text-accent stat-value">
+                                    -{stats.tokenReduction}%
+                                </span>
+                                <div className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">Tokens saved</div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </motion.div>
 
@@ -213,14 +240,39 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                 transition={{ delay: 0.5 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={onReset}
-                className="mt-8 text-muted-foreground hover:text-foreground text-sm font-medium
-                    flex items-center gap-2 transition-colors cursor-pointer py-2 px-4 rounded-lg hover:bg-card"
+                className="mt-6 btn btn-ghost py-3 px-6 text-sm font-medium"
             >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 Process Another
             </motion.button>
+
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="mt-10 text-center"
+            >
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-3">Feed your .toon to</p>
+                <div className="flex items-center justify-center gap-3">
+                    {[
+                        { name: 'ChatGPT', icon: 'M22 11.08C22 5.55 17.58 1.9 12.2 1.74 8.32 1.61 4.5 4.47 3.25 8.47c-.58 1.79-.54 3.62.12 5.39.65 1.74 1.77 3.18 3.18 4.23.62.46 1.17 1.04 1.56 1.7.4.7.62 1.5.62 2.31v1.4c0 .9.7 1.6 1.6 1.6h4.34c.9 0 1.6-.7 1.6-1.6v-1.16c0-1.98 1.31-3.72 3.18-4.32 1.69-.54 3.05-1.73 3.81-3.3.76-1.56.84-3.33.3-4.95-.13-.4-.35-.78-.62-1.1-.1-.1-.16-.23-.16-.36v-.9' },
+                        { name: 'Claude', icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-4-4 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z' },
+                        { name: 'Gemini', icon: 'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' },
+                    ].map((llm) => (
+                        <span key={llm.name}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border rounded-full
+                                text-[11px] font-medium text-secondary-foreground"
+                        >
+                            <svg className="w-3.5 h-3.5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d={llm.icon} />
+                            </svg>
+                            {llm.name}
+                        </span>
+                    ))}
+                </div>
+            </motion.div>
         </motion.div>
     );
 }

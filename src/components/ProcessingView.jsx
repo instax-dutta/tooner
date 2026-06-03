@@ -1,10 +1,27 @@
-import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
-import { formatSize } from '../utils/tokenizer';
+import { formatSize } from '../utils/format';
+
+const STATUS_STAGES = [
+    { threshold: 0, message: 'Initializing', icon: 'M13 10V3L4 14h7v7l9-11h-7z' },
+    { threshold: 15, message: 'Reading file', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
+    { threshold: 35, message: 'Extracting content', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4' },
+    { threshold: 55, message: 'Analyzing structure', icon: 'M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7M4 7h3m-3 0V5l3-3h10l3 3v2m-9 3v6m-3-3h6' },
+    { threshold: 75, message: 'Optimizing tokens', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { threshold: 90, message: 'Generating .toon', icon: 'M5 13l4 4L19 7' },
+];
+
+function getCurrentStage(progress) {
+    return STATUS_STAGES.reduce(
+        (acc, item) => (progress >= item.threshold ? item : acc),
+        STATUS_STAGES[0]
+    );
+}
 
 export default function ProcessingView({ file, progress, onCancel }) {
     const containerRef = useRef(null);
+    const stage = getCurrentStage(progress);
 
     useEffect(() => {
         const ctx = gsap.context(() => {
@@ -17,20 +34,6 @@ export default function ProcessingView({ file, progress, onCancel }) {
         return () => ctx.revert();
     }, []);
 
-    const statusMessages = [
-        { threshold: 0, message: 'Initializing engine...' },
-        { threshold: 15, message: 'Reading file data...' },
-        { threshold: 35, message: 'Extracting content...' },
-        { threshold: 55, message: 'Analyzing structure...' },
-        { threshold: 75, message: 'Optimizing tokens...' },
-        { threshold: 90, message: 'Generating .toon...' },
-    ];
-
-    const currentStatus = statusMessages.reduce(
-        (acc, item) => (progress >= item.threshold ? item.message : acc),
-        statusMessages[0].message
-    );
-
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -39,41 +42,38 @@ export default function ProcessingView({ file, progress, onCancel }) {
             className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 sm:py-24"
         >
             <div ref={containerRef} className="card w-full max-w-sm sm:max-w-md text-center p-8 sm:p-10 mb-8 sm:mb-10">
-                <div className="relative w-36 h-36 sm:w-40 sm:h-40 mx-auto mb-10">
-                    <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                        <circle
-                            cx="50"
-                            cy="50"
-                            r="40"
-                            fill="none"
-                            stroke="hsl(var(--muted))"
-                            strokeWidth="4"
-                        />
-                        <motion.circle
-                            cx="50"
-                            cy="50"
-                            r="40"
-                            fill="none"
-                            stroke="hsl(var(--accent))"
-                            strokeWidth="4"
-                            strokeLinecap="round"
-                            strokeDasharray={`${progress * 2.51} 251`}
-                            animate={{ strokeDasharray: `${progress * 2.51} 251` }}
-                            transition={{ duration: 0.4, ease: 'easeOut' }}
-                        />
+                <motion.div
+                    key={stage.message}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center
+                        bg-accent/10 border border-accent/20 mx-auto mb-6"
+                >
+                    <svg className="w-7 h-7 sm:w-8 sm:h-8 text-accent" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d={stage.icon} />
                     </svg>
+                </motion.div>
 
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-4xl sm:text-5xl font-medium text-foreground font-mono">
-                            {Math.round(progress)}
-                        </span>
-                        <span className="text-xs text-muted-foreground tracking-widest">%</span>
-                    </div>
-                </div>
-
-                <h3 className="text-2xl sm:text-3xl font-medium text-foreground mb-3">
-                    Toonifying<span className="animate-pulse">...</span>
+                <h3 className="text-2xl sm:text-3xl font-medium text-foreground mb-2">
+                    Optimizing for LLMs
+                    <span className="inline-flex ml-1">
+                        <motion.span
+                            animate={{ opacity: [0.3, 1, 0.3] }}
+                            transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+                        >.</motion.span>
+                        <motion.span
+                            animate={{ opacity: [0.3, 1, 0.3] }}
+                            transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
+                        >.</motion.span>
+                        <motion.span
+                            animate={{ opacity: [0.3, 1, 0.3] }}
+                            transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+                        >.</motion.span>
+                    </span>
                 </h3>
+
                 <p className="text-secondary-foreground mb-1 truncate max-w-full font-mono text-sm">
                     {file.name}
                 </p>
@@ -81,7 +81,7 @@ export default function ProcessingView({ file, progress, onCancel }) {
                     {formatSize(file.size)}
                 </p>
 
-                <div className="progress-bar mb-6">
+                <div className="progress-bar mb-5">
                     <motion.div
                         className="progress-bar-fill"
                         animate={{ width: `${progress}%` }}
@@ -89,14 +89,18 @@ export default function ProcessingView({ file, progress, onCancel }) {
                     />
                 </div>
 
-                <motion.p
-                    key={currentStatus}
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-accent text-sm font-medium mb-8 h-5"
-                >
-                    {currentStatus}
-                </motion.p>
+                <AnimatePresence mode="wait">
+                    <motion.p
+                        key={stage.message}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.25 }}
+                        className="text-accent text-sm font-medium mb-8 h-5"
+                    >
+                        {Math.round(progress)}% — {stage.message}
+                    </motion.p>
+                </AnimatePresence>
 
                 <motion.button
                     whileTap={{ scale: 0.97 }}
@@ -106,19 +110,9 @@ export default function ProcessingView({ file, progress, onCancel }) {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                    Cancel Processing
+                    Cancel
                 </motion.button>
             </div>
-
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="flex items-center gap-3 text-sm"
-            >
-                <div className="w-2 h-2 rounded-full bg-accent" />
-                <span className="text-muted-foreground font-medium">Processing locally in your browser</span>
-            </motion.div>
         </motion.div>
     );
 }

@@ -5,21 +5,19 @@
  */
 
 import { encode as encodeToon, decode as decodeToon } from '@toon-format/toon';
-import { encode as gptEncode } from 'gpt-tokenizer';
-import { gzip, gunzip, strToU8, strFromU8 } from 'fflate';
 
 /**
  * Count tokens using GPT tokenizer
  * @param {string} text - Text to count tokens for
  * @returns {number} Token count
  */
-export function countTokens(text) {
+export async function countTokens(text) {
     if (!text || typeof text !== 'string') return 0;
     try {
-        return gptEncode(text).length;
+        const { encode } = await import('gpt-tokenizer');
+        return encode(text).length;
     } catch (error) {
         console.warn('Token counting failed, using estimation:', error);
-        // Fallback: rough estimation (1 token ≈ 4 characters)
         return Math.ceil(text.length / 4);
     }
 }
@@ -116,7 +114,8 @@ export function optimizeContent(content) {
  * @param {string} content - Content to compress
  * @returns {Promise<Uint8Array>} Compressed data
  */
-export function compressContent(content) {
+export async function compressContent(content) {
+    const { gzip, strToU8 } = await import('fflate');
     return new Promise((resolve, reject) => {
         try {
             const data = strToU8(content);
@@ -135,7 +134,8 @@ export function compressContent(content) {
  * @param {Uint8Array} compressed - Compressed data
  * @returns {Promise<string>} Decompressed content
  */
-export function decompressContent(compressed) {
+export async function decompressContent(compressed) {
+    const { gunzip, strFromU8 } = await import('fflate');
     return new Promise((resolve, reject) => {
         gunzip(compressed, (err, decompressed) => {
             if (err) reject(err);
@@ -171,11 +171,11 @@ export async function generateToonFile({
     rawContent,
 }) {
     // Count original tokens
-    const originalTokens = countTokens(rawContent);
+    const originalTokens = await countTokens(rawContent);
 
     // Optimize content (lossless - only whitespace normalization + TOON format)
     const { content: optimizedContent, isToon } = optimizeContent(rawContent);
-    const optimizedTokens = countTokens(optimizedContent);
+    const optimizedTokens = await countTokens(optimizedContent);
 
     // Compress with gzip (lossless compression)
     const compressed = await compressContent(optimizedContent);
@@ -235,50 +235,6 @@ export async function generateToonFile({
  * Create a downloadable .toon file
  * @param {Object} toonData - Toon file data
  * @returns {Blob} Downloadable blob
- */
-export function createToonBlob(toonData) {
-    const json = JSON.stringify(toonData, null, 2);
-    return new Blob([json], { type: 'application/json' });
-}
-
-/**
- * Generate download filename from original
- * @param {string} originalFilename - Original filename
- * @returns {string} New filename with .toon extension
- */
-export function getToonFilename(originalFilename) {
-    const baseName = originalFilename.replace(/\.[^/.]+$/, '');
-    return `${baseName}.toon`;
-}
-
-/**
- * Format byte size for display
- * @param {number} bytes - Size in bytes
- * @returns {string} Formatted size string
- */
-export function formatSize(bytes) {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
-}
-
-/**
- * Format token count for display
- * @param {number} tokens - Token count
- * @returns {string} Formatted token string
- */
-export function formatTokens(tokens) {
-    if (tokens < 1000) return tokens.toString();
-    if (tokens < 1000000) return `${(tokens / 1000).toFixed(1)}K`;
-    return `${(tokens / 1000000).toFixed(2)}M`;
-}
-
-/**
- * Decode a .toon file back to original content
- * @param {Object} toonFile - The .toon file object
- * @returns {Promise<string>} Decoded content
  */
 export async function decodeToonFile(toonFile) {
     if (!toonFile?.optimized?.content) {

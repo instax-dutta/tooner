@@ -12,7 +12,7 @@
   --secondary-foreground: 210 17% 85%;
   --muted: 210 10% 14%;
   --muted-foreground: 210 8% 46%;
-  --accent: 10 60% 35%;
+  --accent: 12 65% 42%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 100%;
@@ -25,21 +25,4 @@
   --card-shadow: none;
   --card-backdrop: none;
   --border-width: 1px;
-}
-
-* {
-  border-color: hsl(var(--border));
-}
-
-body {
-  font-family: var(--font-sans);
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-  font-weight: 500;
 }

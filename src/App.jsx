@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import gsap from 'gsap';
 import Lenis from 'lenis';
 import Header from './components/Header';
 import DropZone from './components/DropZone';
 import ProcessingView from './components/ProcessingView';
 import ResultsView from './components/ResultsView';
-import { processFile } from './utils/fileProcessors';
-import { generateToonFile } from './utils/tokenizer';
+import { registry, registerBuiltinConverters } from './converters';
+
+registerBuiltinConverters();
 
 function App() {
     const [state, setState] = useState('idle');
@@ -33,8 +33,6 @@ function App() {
         return () => lenis.destroy();
     }, []);
 
-
-
     const handleFileSelect = async (selectedFile) => {
         setFile(selectedFile);
         setState('processing');
@@ -42,12 +40,13 @@ function App() {
         setError(null);
 
         try {
-            const { content, format } = await processFile(selectedFile, (p) => {
+            const { content, format } = await registry.convert(selectedFile, (p) => {
                 setProgress(p * 0.6);
             });
 
             setProgress(70);
 
+            const { generateToonFile } = await import('./utils/tokenizer');
             const { toonFile, stats } = await generateToonFile({
                 originalFilename: selectedFile.name,
                 originalFormat: format,
@@ -60,6 +59,10 @@ function App() {
 
             setResults({ toonFile, stats });
             setState('done');
+            try {
+                const stored = localStorage.getItem('tooner_runs');
+                localStorage.setItem('tooner_runs', String((stored ? parseInt(stored, 10) : 0) + 1));
+            } catch { /* localStorage unavailable */ }
         } catch (err) {
             console.error('Processing error:', err);
             setError(err.message);
@@ -118,21 +121,36 @@ function App() {
                     {state === 'error' && (
                         <div key="error" className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 sm:py-24">
                             <div className="card max-w-sm sm:max-w-md w-full p-8 sm:p-10 text-center">
-                                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-destructive/10 border border-destructive/20 
+                                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-destructive/10 border border-destructive/20
                                     flex items-center justify-center mx-auto mb-8">
                                     <svg className="w-8 h-8 sm:w-10 sm:h-10 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                                     </svg>
                                 </div>
                                 <h2 className="text-2xl sm:text-3xl font-medium text-foreground mb-4">
-                                    Failed
+                                    {error?.includes('File too large') ? 'File too large' :
+                                     error?.includes('Unsupported') ? 'Unsupported format' :
+                                     error?.includes('Failed to read') ? 'Could not read file' :
+                                     error?.includes('No converter') ? 'Format not supported' :
+                                     'Something went wrong'}
                                 </h2>
-                                <p className="text-muted-foreground mb-10 text-sm leading-relaxed">{error}</p>
+                                <p className="text-muted-foreground mb-6 text-sm leading-relaxed">{error}</p>
+                                <div className="flex flex-col gap-2 items-center mb-8">
+                                    {error?.includes('File too large') && (
+                                        <p className="text-[11px] text-muted-foreground">Max file size is 100MB. Try a smaller file.</p>
+                                    )}
+                                    {error?.includes('No converter') && (
+                                        <p className="text-[11px] text-muted-foreground">This file format isn't supported yet.</p>
+                                    )}
+                                    {error?.includes('Failed to read') && (
+                                        <p className="text-[11px] text-muted-foreground">The file may be corrupted or protected.</p>
+                                    )}
+                                </div>
                                 <button
                                     onClick={handleReset}
                                     className="btn btn-primary w-full py-3.5 text-sm font-medium"
                                 >
-                                    Back to Upload
+                                    Try another file
                                 </button>
                             </div>
                         </div>

@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -14,8 +15,9 @@ export default defineConfig({
           'pdf': ['pdfjs-dist'],
           'excel': ['xlsx'],
           'docx': ['mammoth'],
-          'data': ['papaparse', 'fflate'],
-          'tokenizer': ['gpt-tokenizer'],
+          'csv': ['papaparse'],
+          'gzip': ['fflate'],
+          'gpt-tokenizer': ['gpt-tokenizer'],
           'toon': ['@toon-format/toon'],
           'motion': ['framer-motion'],
           'gsap': ['gsap'],
@@ -31,5 +33,9 @@ export default defineConfig({
   },
   worker: {
     format: 'es',
+  },
+  test: {
+    environment: 'node',
+    include: ['src/**/*.test.js'],
   },
 })

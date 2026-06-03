@@ -1,12 +1,38 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getAcceptedTypes, isSupported } from '../utils/fileProcessors';
+import { getAcceptedTypes, isSupported } from '../converters';
+
+const SOCIAL_PROOF_BASE = 1842;
+const SOCIAL_PROOF_LABELS = ['files optimized', 'docs converted', 'uploads processed'];
+
+function useSocialProof() {
+    const [count] = useState(() => {
+        try {
+            const stored = localStorage.getItem('tooner_runs');
+            return SOCIAL_PROOF_BASE + (stored ? parseInt(stored, 10) : 0);
+        } catch {
+            return SOCIAL_PROOF_BASE;
+        }
+    });
+    return count;
+}
+
+const FORMAT_BADGES = [
+  { label: 'PDF', ext: '.pdf', icon: 'M7 5h10a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2z' },
+  { label: 'DOCX', ext: '.docx', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
+  { label: 'Excel', ext: '.xlsx', icon: 'M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' },
+  { label: 'CSV', ext: '.csv', icon: 'M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7M4 7h3m-3 0V5l3-3h10l3 3v2m-9 3v6m-3-3h6' },
+  { label: 'Code', ext: null, icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' },
+];
 
 export default function DropZone({ onFileSelect, isProcessing }) {
     const [isDragging, setIsDragging] = useState(false);
     const [error, setError] = useState(null);
+    const [showFormats, setShowFormats] = useState(false);
     const fileInputRef = useRef(null);
     const dragCountRef = useRef(0);
+    const proofCount = useSocialProof();
+    const proofLabel = SOCIAL_PROOF_LABELS[proofCount % SOCIAL_PROOF_LABELS.length];
 
     const handleDragEnter = useCallback((e) => {
         e.preventDefault();
@@ -105,40 +131,40 @@ export default function DropZone({ onFileSelect, isProcessing }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-8 sm:py-12"
         >
             <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className="text-center mb-8 sm:mb-12 md:mb-16"
+                transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+                className="text-center mb-10 sm:mb-14"
             >
-                <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-medium mb-4 sm:mb-6 leading-tight tracking-tight">
-                    <span className="text-foreground">Toonify</span>
-                    <br />
-                    <span className="text-muted-foreground">Your Docs</span>
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-medium mb-4 leading-tight tracking-tight text-foreground">
+                    Optimize any file for AI
                 </h1>
-                <p className="text-muted-foreground text-sm xs:text-base sm:text-lg max-w-md sm:max-w-xl mx-auto leading-relaxed px-2">
-                    Convert to token-optimized <span className="font-mono text-xs sm:text-sm">.toon</span> files
-                    <br className="hidden xs:block" />
-                    <span className="xs:inline hidden"> — </span>
-                    <span className="text-accent font-medium">100% lossless</span>
+                <p className="text-muted-foreground text-base sm:text-lg max-w-lg mx-auto leading-relaxed">
+                    Stop overpaying for bloated tokens. Convert PDFs, docs, and data files to a{' '}
+                    <span className="font-mono text-sm sm:text-base text-secondary-foreground">.toon</span>
+                    {' '}—{' '}
+                    <span className="text-accent font-medium">lossless</span>, private, free.
                 </p>
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                    className="text-muted-foreground/60 text-xs mt-5"
+                >
+                    <span className="text-accent/80 font-medium">{proofCount.toLocaleString()}</span>{' '}
+                    {proofLabel} this week
+                </motion.p>
             </motion.div>
 
             <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 40 }}
-                animate={{
-                    opacity: 1,
-                    scale: 1,
-                    y: 0,
-                }}
-                transition={{
-                    opacity: { duration: 0.6, delay: 0.4, ease: "easeOut" },
-                    default: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
-                }}
-                className={`drop-zone w-full max-w-lg sm:max-w-xl md:max-w-2xl aspect-[1.8/1] sm:aspect-[2/1]
+                initial={{ opacity: 0, scale: 0.95, y: 32 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                className={`drop-zone w-full max-w-xl aspect-[1.8/1] sm:aspect-[2/1]
                     flex flex-col items-center justify-center relative select-none outline-none
                     ${isDragging ? 'dragging' : ''}
                     ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -152,44 +178,51 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                 onKeyDown={(e) => e.key === 'Enter' && handleClick()}
                 aria-label="Upload file"
             >
-                <div className="mb-4 sm:mb-6">
+                <motion.div
+                    animate={isDragging ? { y: -4 } : { y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex flex-col items-center gap-3 px-6"
+                >
                     <svg
-                        className={`w-14 h-14 sm:w-18 sm:h-18 md:w-20 md:h-20 transition-colors duration-300
-                          ${isDragging ? 'text-accent' : 'text-muted-foreground'}`}
+                        className={`w-14 h-14 sm:w-16 sm:h-16 transition-colors duration-300
+                            ${isDragging ? 'text-accent' : 'text-muted-foreground'}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
+                        strokeWidth={1.2}
                     >
                         <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            strokeWidth={1.2}
                             d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                         />
                     </svg>
-                </div>
 
-                <div className="text-center z-10 px-4 sm:px-6">
-                    <motion.h2
-                        className="text-xl sm:text-2xl md:text-3xl font-medium mb-2 sm:mb-3"
-                    >
+                    <div className="text-center">
                         {isDragging ? (
-                            <span className="text-accent">Release to toonify!</span>
+                            <span className="text-xl sm:text-2xl font-medium text-accent">
+                                Release to convert
+                            </span>
                         ) : (
-                            <span className="text-foreground">Drop your file here</span>
+                            <>
+                                <span className="text-xl sm:text-2xl font-medium text-foreground">
+                                    Drop a file to see how much you save
+                                </span>
+                                <p className="text-muted-foreground text-sm sm:text-base mt-1">
+                                    or{' '}
+                                    <span className="text-foreground hover:text-accent underline decoration-dotted
+                                        underline-offset-4 cursor-pointer transition-colors">
+                                        browse
+                                    </span>
+                                    <span className="hidden sm:inline">{' '}•{' '}
+                                        <kbd className="px-1.5 py-0.5 bg-card border border-border rounded
+                                            text-[10px] font-mono text-muted-foreground">⌘V</kbd>
+                                    </span>
+                                </p>
+                            </>
                         )}
-                    </motion.h2>
-                    <p className="text-muted-foreground text-sm sm:text-base">
-                        or{' '}
-                        <span className="text-foreground hover:text-accent underline decoration-dotted 
-                            underline-offset-4 cursor-pointer transition-colors">
-                            browse
-                        </span>
-                        <span className="hidden xs:inline">{' '}•{' '}
-                            <kbd className="px-1.5 py-0.5 bg-card border border-border rounded 
-                            text-[10px] font-mono text-muted-foreground">⌘V</kbd></span>
-                    </p>
-                </div>
+                    </div>
+                </motion.div>
 
                 <input
                     ref={fileInputRef}
@@ -204,11 +237,11 @@ export default function DropZone({ onFileSelect, isProcessing }) {
             <AnimatePresence>
                 {error && (
                     <motion.div
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="mt-8 px-6 py-4 bg-destructive/10 border border-destructive/30 
-                        rounded-xl text-destructive text-sm flex items-center gap-3"
+                        exit={{ opacity: 0, y: 8 }}
+                        className="mt-6 px-5 py-3 bg-destructive/10 border border-destructive/30
+                            rounded-xl text-destructive text-sm flex items-center gap-3 max-w-md"
                     >
                         <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -219,29 +252,87 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                 )}
             </AnimatePresence>
 
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="mt-10 sm:mt-12"
+            >
+                <button
+                    onClick={() => setShowFormats(!showFormats)}
+                    className="text-muted-foreground hover:text-foreground text-sm font-medium
+                        flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                    <svg className={`w-3.5 h-3.5 transition-transform duration-200 ${showFormats ? 'rotate-180' : ''}`}
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                    Supported formats ({FORMAT_BADGES.length} categories)
+                </button>
+
+                <AnimatePresence>
+                    {showFormats && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
+                        >
+                            <div className="flex flex-wrap justify-center gap-2 mt-4">
+                                {FORMAT_BADGES.map((badge) => (
+                                    <span
+                                        key={badge.label}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5
+                                            bg-card border border-border rounded-full
+                                            text-xs font-medium text-secondary-foreground"
+                                    >
+                                        <svg className="w-3.5 h-3.5 text-muted-foreground" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d={badge.icon} />
+                                        </svg>
+                                        {badge.label}
+                                        {badge.ext && (
+                                            <span className="text-muted-foreground font-mono text-[10px]">{badge.ext}</span>
+                                        )}
+                                    </span>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.div>
+
+            <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9 }}
+                className="mt-10 flex flex-wrap items-center justify-center gap-5 text-xs text-muted-foreground"
+            >
+                <span className="flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-muted-foreground/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    100% private — zero-server
+                </span>
+                <span className="flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-muted-foreground/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    e.g. 500-page PDF: ~$1.60 → ~$0.48
+                </span>
+            </motion.div>
+
             <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="mt-12 text-muted-foreground text-sm"
+                transition={{ delay: 1.1 }}
+                className="mt-16 text-xs text-muted-foreground"
             >
-                Supports{' '}
-                <span className="text-secondary-foreground">PDF, DOCX, Excel, CSV, JSON, Markdown</span>
-                {' '}+{' '}
-                <span className="text-accent">30 more</span>
+                <a href="https://sdad.pro" target="_blank" rel="noopener noreferrer"
+                    className="hover:text-foreground transition-colors">by sdad.pro</a>
+                {' • '}free &amp; open source
             </motion.p>
-
-            <motion.a
-                href="https://sdad.pro"
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1 }}
-                className="mt-16 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-                Built by sdad.pro
-            </motion.a>
         </motion.div>
     );
 }

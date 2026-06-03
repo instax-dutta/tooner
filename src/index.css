@@ -91,7 +91,12 @@ h1, h2, h3, h4, h5, h6 {
   background: hsl(var(--secondary));
   color: hsl(var(--secondary-foreground));
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.btn:focus-visible {
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
 }
 
 .btn-primary {
@@ -100,8 +105,12 @@ h1, h2, h3, h4, h5, h6 {
   border-color: transparent;
 }
 
-.btn-primary:active {
+.btn-primary:hover {
   background: hsl(var(--primary) / 0.85);
+}
+
+.btn-primary:active {
+  background: hsl(var(--primary) / 0.7);
 }
 
 .btn-secondary {
@@ -110,8 +119,28 @@ h1, h2, h3, h4, h5, h6 {
   border-color: hsl(var(--border));
 }
 
-.btn-secondary:active {
+.btn-secondary:hover {
   background: hsl(var(--card));
+  border-color: hsl(var(--ring));
+}
+
+.btn-secondary:active {
+  background: hsl(var(--secondary));
+}
+
+.btn-ghost {
+  background: transparent;
+  color: hsl(var(--muted-foreground));
+  border-color: transparent;
+}
+
+.btn-ghost:hover {
+  color: hsl(var(--foreground));
+  background: hsl(var(--card));
+}
+
+.btn-ghost:active {
+  background: hsl(var(--secondary));
 }
 
 .btn-accent {
@@ -120,8 +149,12 @@ h1, h2, h3, h4, h5, h6 {
   border-color: transparent;
 }
 
-.btn-accent:active {
+.btn-accent:hover {
   background: hsl(var(--accent) / 0.85);
+}
+
+.btn-accent:active {
+  background: hsl(var(--accent) / 0.7);
 }
 
 /* =============================================================================
@@ -158,6 +191,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .drop-zone:hover {
   border-color: hsl(var(--ring));
+}
+
+.drop-zone:focus-visible {
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
 }
 
 .drop-zone.dragging {
