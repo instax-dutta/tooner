@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import Lenis from 'lenis';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import DropZone from './components/DropZone';
 import ProcessingView from './components/ProcessingView';
 import ResultsView from './components/ResultsView';
@@ -157,6 +158,8 @@ function App() {
                     )}
                 </AnimatePresence>
             </main>
+
+            <Footer />
         </div>
     );
 }
