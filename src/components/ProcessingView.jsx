@@ -27,8 +27,8 @@ export default function ProcessingView({ file, progress, onCancel }) {
         const ctx = gsap.context(() => {
             gsap.fromTo(
                 containerRef.current,
-                { scale: 0.8, opacity: 0 },
-                { scale: 1, opacity: 1, duration: 0.6, ease: 'power3.out' }
+                { scale: 0.9, opacity: 0 },
+                { scale: 1, opacity: 1, duration: 0.5, ease: 'power3.out' }
             );
         });
         return () => ctx.revert();
@@ -39,24 +39,24 @@ export default function ProcessingView({ file, progress, onCancel }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-20 sm:py-24"
+            className="flex flex-col items-center justify-center h-full px-4 sm:px-6 py-6"
         >
-            <div ref={containerRef} className="card w-full max-w-sm sm:max-w-md text-center p-8 sm:p-10 mb-8 sm:mb-10">
+            <div ref={containerRef} className="card w-full max-w-sm sm:max-w-md text-center p-6 sm:p-8">
                 <motion.div
                     key={stage.message}
-                    initial={{ scale: 0.8, opacity: 0 }}
+                    initial={{ scale: 0.85, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center
-                        bg-accent/10 border border-accent/20 mx-auto mb-6"
+                    transition={{ duration: 0.25 }}
+                    className="w-11 h-11 sm:w-13 sm:h-13 rounded-xl flex items-center justify-center
+                        bg-accent/10 border border-accent/20 mx-auto mb-4"
                 >
-                    <svg className="w-7 h-7 sm:w-8 sm:h-8 text-accent" fill="none" stroke="currentColor"
+                    <svg className="w-5.5 h-5.5 sm:w-6 sm:h-6 text-accent" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d={stage.icon} />
                     </svg>
                 </motion.div>
 
-                <h3 className="text-2xl sm:text-3xl font-medium text-foreground mb-2">
+                <h3 className="text-xl sm:text-2xl font-medium text-foreground mb-1">
                     Optimizing for LLMs
                     <span className="inline-flex ml-1">
                         <motion.span
@@ -74,14 +74,14 @@ export default function ProcessingView({ file, progress, onCancel }) {
                     </span>
                 </h3>
 
-                <p className="text-secondary-foreground mb-1 truncate max-w-full font-mono text-sm">
+                <p className="text-secondary-foreground mb-0.5 truncate max-w-full font-mono text-xs">
                     {file.name}
                 </p>
-                <p className="text-muted-foreground text-sm mb-8">
+                <p className="text-muted-foreground text-xs mb-5">
                     {formatSize(file.size)}
                 </p>
 
-                <div className="progress-bar mb-5">
+                <div className="progress-bar mb-3">
                     <motion.div
                         className="progress-bar-fill"
                         animate={{ width: `${progress}%` }}
@@ -92,11 +92,11 @@ export default function ProcessingView({ file, progress, onCancel }) {
                 <AnimatePresence mode="wait">
                     <motion.p
                         key={stage.message}
-                        initial={{ opacity: 0, y: 6 }}
+                        initial={{ opacity: 0, y: 4 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -6 }}
-                        transition={{ duration: 0.25 }}
-                        className="text-accent text-sm font-medium mb-8 h-5"
+                        exit={{ opacity: 0, y: -4 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-accent text-xs font-medium mb-5 h-4"
                     >
                         {Math.round(progress)}% — {stage.message}
                     </motion.p>
@@ -105,9 +105,9 @@ export default function ProcessingView({ file, progress, onCancel }) {
                 <motion.button
                     whileTap={{ scale: 0.97 }}
                     onClick={onCancel}
-                    className="btn btn-secondary w-full py-3.5 text-sm font-medium"
+                    className="btn btn-secondary w-full py-3 text-xs font-medium"
                 >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                     Cancel

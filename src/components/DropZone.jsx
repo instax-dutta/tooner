@@ -132,39 +132,38 @@ export default function DropZone({ onFileSelect, isProcessing }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] px-4 sm:px-6 py-8 sm:py-12"
+            className="flex flex-col items-center justify-center h-full px-4 sm:px-6 py-6"
         >
             <motion.div
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-                className="text-center mb-10 sm:mb-14"
+                transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                className="text-center mb-4 sm:mb-6"
             >
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-medium mb-4 leading-tight tracking-tight text-foreground">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-medium mb-2 leading-tight tracking-tight text-foreground">
                     Optimize any file for AI
                 </h1>
-                <p className="text-muted-foreground text-base sm:text-lg max-w-lg mx-auto leading-relaxed">
-                    Stop overpaying for bloated tokens. Convert PDFs, docs, and data files to a{' '}
-                    <span className="font-mono text-sm sm:text-base text-secondary-foreground">.toon</span>
-                    {' '}—{' '}
-                    <span className="text-accent font-medium">lossless</span>, private, free.
+                <p className="text-muted-foreground text-sm sm:text-base max-w-md mx-auto leading-relaxed">
+                    Stop overpaying for bloated tokens. Convert PDFs, docs, and data files to{' '}
+                    <span className="font-mono text-secondary-foreground">.toon</span>
+                    {' '}— <span className="text-accent font-medium">lossless</span>, private, free.
                 </p>
                 <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 }}
-                    className="text-muted-foreground/60 text-xs mt-5"
+                    transition={{ delay: 0.7 }}
+                    className="text-muted-foreground/50 text-[11px] mt-3"
                 >
-                    <span className="text-accent/80 font-medium">{proofCount.toLocaleString()}</span>{' '}
+                    <span className="text-accent/70 font-medium">{proofCount.toLocaleString()}</span>{' '}
                     {proofLabel} this week
                 </motion.p>
             </motion.div>
 
             <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 32 }}
+                initial={{ opacity: 0, scale: 0.97, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                className={`drop-zone w-full max-w-xl aspect-[1.8/1] sm:aspect-[2/1]
+                transition={{ duration: 0.45, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                className={`drop-zone w-full max-w-lg aspect-[3/1] sm:aspect-[3.5/1]
                     flex flex-col items-center justify-center relative select-none outline-none
                     ${isDragging ? 'dragging' : ''}
                     ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -181,10 +180,10 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                 <motion.div
                     animate={isDragging ? { y: -4 } : { y: 0 }}
                     transition={{ duration: 0.3 }}
-                    className="flex flex-col items-center gap-3 px-6"
+                    className="flex flex-col items-center gap-2 px-6"
                 >
                     <svg
-                        className={`w-14 h-14 sm:w-16 sm:h-16 transition-colors duration-300
+                        className={`w-10 h-10 sm:w-12 sm:h-12 transition-colors duration-300
                             ${isDragging ? 'text-accent' : 'text-muted-foreground'}`}
                         fill="none"
                         stroke="currentColor"
@@ -200,15 +199,15 @@ export default function DropZone({ onFileSelect, isProcessing }) {
 
                     <div className="text-center">
                         {isDragging ? (
-                            <span className="text-xl sm:text-2xl font-medium text-accent">
+                            <span className="text-lg sm:text-xl font-medium text-accent">
                                 Release to convert
                             </span>
                         ) : (
                             <>
-                                <span className="text-xl sm:text-2xl font-medium text-foreground">
+                                <span className="text-lg sm:text-xl font-medium text-foreground">
                                     Drop a file to see how much you save
                                 </span>
-                                <p className="text-muted-foreground text-sm sm:text-base mt-1">
+                                <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">
                                     or{' '}
                                     <span className="text-foreground hover:text-accent underline decoration-dotted
                                         underline-offset-4 cursor-pointer transition-colors">
@@ -237,13 +236,13 @@ export default function DropZone({ onFileSelect, isProcessing }) {
             <AnimatePresence>
                 {error && (
                     <motion.div
-                        initial={{ opacity: 0, y: 8 }}
+                        initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 8 }}
-                        className="mt-6 px-5 py-3 bg-destructive/10 border border-destructive/30
-                            rounded-xl text-destructive text-sm flex items-center gap-3 max-w-md"
+                        exit={{ opacity: 0, y: 6 }}
+                        className="mt-3 px-4 py-2.5 bg-destructive/10 border border-destructive/30
+                            rounded-xl text-destructive text-xs flex items-center gap-2 max-w-md"
                     >
-                        <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -255,15 +254,15 @@ export default function DropZone({ onFileSelect, isProcessing }) {
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="mt-10 sm:mt-12"
+                transition={{ delay: 0.5 }}
+                className="mt-4 sm:mt-5 flex flex-col items-center gap-3"
             >
                 <button
                     onClick={() => setShowFormats(!showFormats)}
-                    className="text-muted-foreground hover:text-foreground text-sm font-medium
+                    className="text-muted-foreground hover:text-foreground text-xs font-medium
                         flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
-                    <svg className={`w-3.5 h-3.5 transition-transform duration-200 ${showFormats ? 'rotate-180' : ''}`}
+                    <svg className={`w-3 h-3 transition-transform duration-200 ${showFormats ? 'rotate-180' : ''}`}
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
@@ -279,21 +278,21 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                             transition={{ duration: 0.2 }}
                             className="overflow-hidden"
                         >
-                            <div className="flex flex-wrap justify-center gap-2 mt-4">
+                            <div className="flex flex-wrap justify-center gap-1.5">
                                 {FORMAT_BADGES.map((badge) => (
                                     <span
                                         key={badge.label}
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5
+                                        className="inline-flex items-center gap-1 px-2.5 py-1
                                             bg-card border border-border rounded-full
-                                            text-xs font-medium text-secondary-foreground"
+                                            text-[10px] font-medium text-secondary-foreground"
                                     >
-                                        <svg className="w-3.5 h-3.5 text-muted-foreground" fill="none"
+                                        <svg className="w-3 h-3 text-muted-foreground" fill="none"
                                             stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d={badge.icon} />
                                         </svg>
                                         {badge.label}
                                         {badge.ext && (
-                                            <span className="text-muted-foreground font-mono text-[10px]">{badge.ext}</span>
+                                            <span className="text-muted-foreground font-mono text-[9px]">{badge.ext}</span>
                                         )}
                                     </span>
                                 ))}
@@ -304,35 +303,30 @@ export default function DropZone({ onFileSelect, isProcessing }) {
             </motion.div>
 
             <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9 }}
-                className="mt-10 flex flex-wrap items-center justify-center gap-5 text-xs text-muted-foreground"
-            >
-                <span className="flex items-center gap-1.5">
-                    <svg className="w-3.5 h-3.5 text-muted-foreground/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    100% private — zero-server
-                </span>
-                <span className="flex items-center gap-1.5">
-                    <svg className="w-3.5 h-3.5 text-muted-foreground/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
-                    e.g. 500-page PDF: ~$1.60 → ~$0.48
-                </span>
-            </motion.div>
-
-            <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1.1 }}
-                className="mt-16 text-xs text-muted-foreground"
+                transition={{ delay: 0.6 }}
+                className="mt-5 flex flex-wrap items-center justify-center gap-4 text-[11px] text-muted-foreground"
             >
+                <span className="flex items-center gap-1">
+                    <svg className="w-3 h-3 text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    100% private
+                </span>
+                <span className="w-px h-3 bg-border" />
+                <span className="flex items-center gap-1">
+                    <svg className="w-3 h-3 text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    500-page PDF: ~$1.60 → ~$0.48
+                </span>
+                <span className="w-px h-3 bg-border" />
                 <a href="https://sdad.pro" target="_blank" rel="noopener noreferrer"
-                    className="hover:text-foreground transition-colors">by sdad.pro</a>
-                {' • '}free &amp; open source
-            </motion.p>
+                    className="hover:text-foreground transition-colors">
+                    by sdad.pro
+                </a>
+            </motion.div>
         </motion.div>
     );
 }
