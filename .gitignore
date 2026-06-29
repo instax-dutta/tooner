@@ -33,3 +33,6 @@ Thumbs.db
 # Agent/AI folders
 .agent
 .gemini
+
+# Graphify output
+graphify-out/

@@ -172,6 +172,17 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                             </div>
                         </>
                     )}
+                    {stats.chunks && stats.chunks.length > 0 && (
+                        <>
+                            <div className="w-px h-8 bg-border" />
+                            <div className="text-center">
+                                <span className="text-xl sm:text-2xl font-medium leading-none text-foreground font-mono">
+                                    {stats.chunks.length}
+                                </span>
+                                <div className="text-[9px] text-muted-foreground uppercase tracking-wider mt-1">RAG Chunks</div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </motion.div>
 

@@ -1,6 +1,7 @@
 import { detectFileType } from './fileTypeDetector.js';
 
 export const PRIORITY_SPECIFIC = 0;
+export const PRIORITY_FALLBACK = 5;
 export const PRIORITY_GENERIC = 10;
 
 export class ConversionError extends Error {

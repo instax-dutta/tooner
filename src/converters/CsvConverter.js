@@ -27,13 +27,15 @@ export class CsvConverter extends DocumentConverter {
     }
 
     const headers = Object.keys(parsed.data[0]);
-    const lines = parsed.data.map(row =>
-      headers.map(h => `${h}: ${row[h]}`).join(' | ')
+    const headerRow = headers.join(' | ');
+    const separator = headers.map(() => '---').join(' | ');
+    const dataRows = parsed.data.map(row =>
+      headers.map(h => row[h] ?? '').join(' | ')
     );
 
     onProgress(80);
     return {
-      content: `Headers: ${headers.join(', ')}\n\n${lines.join('\n')}`,
+      content: [headerRow, separator, ...dataRows].join('\n'),
       format: 'csv',
     };
   }

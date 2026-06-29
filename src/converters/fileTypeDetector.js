@@ -10,7 +10,7 @@ const MAGIC_BYTES = [
 ];
 
 const ZIP_EXTENSIONS = new Set([
-  '.docx', '.xlsx', '.xlsm', '.pptx', '.odt', '.ods', '.odp',
+  '.docx', '.xlsx', '.xlsm', '.pptx', '.odt', '.ods', '.odp', '.epub',
 ]);
 
 const MIME_TO_EXT = {
@@ -19,6 +19,7 @@ const MIME_TO_EXT = {
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
   'application/vnd.openxmlformats-officedocument.presentationml.presentation': '.pptx',
   'application/vnd.ms-excel': '.xls',
+  'application/epub+zip': '.epub',
   'text/csv': '.csv',
   'application/json': '.json',
   'application/xml': '.xml',
@@ -38,10 +39,10 @@ const TEXT_EXTENSIONS = new Set([
   '.txt', '.md', '.rtf', '.json', '.xml', '.yaml', '.toml',
   '.js', '.jsx', '.ts', '.tsx', '.py', '.java', '.cpp', '.c',
   '.h', '.hpp', '.cs', '.go', '.rs', '.rb', '.php', '.swift',
-  '.kt', '.html', '.css', '.scss', '.less', '.sql', '.sh', '.bash', '.zsh',
+  '.kt', '.html', '.htm', '.css', '.scss', '.less', '.sql', '.sh', '.bash', '.zsh',
 ]);
 
-const DATA_EXTENSIONS = new Set(['.csv', '.xlsx', '.xls']);
+const DATA_EXTENSIONS = new Set(['.csv', '.xlsx', '.xls', '.pptx', '.epub']);
 
 /**
  * Get file extension from filename.

@@ -12,6 +12,18 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@markitdownjs/ast": "^0.1.2",
+    "@markitdownjs/chunking": "^0.1.2",
+    "@markitdownjs/core": "^0.2.0",
+    "@markitdownjs/csv": "^0.1.2",
+    "@markitdownjs/docx": "^0.2.0",
+    "@markitdownjs/epub": "^0.1.2",
+    "@markitdownjs/html": "^0.2.0",
+    "@markitdownjs/pdf": "^0.2.0",
+    "@markitdownjs/pptx": "^0.1.2",
+    "@markitdownjs/shared": "^0.2.0",
+    "@markitdownjs/xlsx": "^0.2.0",
+    "@markitdownjs/xml": "^0.1.2",
     "@tailwindcss/vite": "^4.1.18",
     "@toon-format/toon": "^2.1.0",
     "fflate": "^0.8.2",

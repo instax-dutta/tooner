@@ -20,8 +20,11 @@ function useSocialProof() {
 const FORMAT_BADGES = [
   { label: 'PDF', ext: '.pdf', icon: 'M7 5h10a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2z' },
   { label: 'DOCX', ext: '.docx', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
+  { label: 'PPTX', ext: '.pptx', icon: 'M3 3h18v18H3V3zm4 4v4h4V7H7zm0 6v4h10v-4H7zm6-6v4h4V7h-4z' },
   { label: 'Excel', ext: '.xlsx', icon: 'M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z' },
   { label: 'CSV', ext: '.csv', icon: 'M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7M4 7h3m-3 0V5l3-3h10l3 3v2m-9 3v6m-3-3h6' },
+  { label: 'EPUB', ext: '.epub', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
+  { label: 'HTML', ext: '.html', icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' },
   { label: 'Code', ext: null, icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' },
 ];
 
@@ -146,7 +149,7 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                 <p className="text-muted-foreground text-sm sm:text-base max-w-md mx-auto leading-relaxed">
                     Stop overpaying for bloated tokens. Convert PDFs, docs, and data files to{' '}
                     <span className="font-mono text-secondary-foreground">.toon</span>
-                    {' '}— <span className="text-accent font-medium">lossless</span>, private, free.
+                    {' '}— <span className="text-accent font-medium">AI-optimized</span>, private, free.
                 </p>
                 <motion.p
                     initial={{ opacity: 0 }}

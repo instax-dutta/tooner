@@ -17,7 +17,7 @@ export class XmlConverter extends DocumentConverter {
       .trim();
 
     return {
-      content: `[Structured XML]\n${content}\n\n[Text Content]\n${textContent}`,
+      content: textContent,
       format: 'xml',
     };
   }

@@ -4,7 +4,7 @@ import {
   ConverterRegistry, ConversionError, registry, PRIORITY_SPECIFIC, PRIORITY_GENERIC,
   detectFileType, getExtension, isSupported, getAcceptedTypes,
   PlainTextConverter, JsonConverter, XmlConverter, CsvConverter,
-  ExcelConverter, DocxConverter, PdfConverter, registerBuiltinConverters,
+  ExcelConverter, DocxConverter, PdfConverter, MarkItDownConverter, registerBuiltinConverters,
 } from '../index.js';
 
 describe('converters barrel exports', () => {
@@ -28,6 +28,7 @@ describe('converters barrel exports', () => {
     expect(ExcelConverter).toBeDefined();
     expect(DocxConverter).toBeDefined();
     expect(PdfConverter).toBeDefined();
+    expect(MarkItDownConverter).toBeDefined();
     expect(registerBuiltinConverters).toBeInstanceOf(Function);
   });
 
@@ -35,6 +36,6 @@ describe('converters barrel exports', () => {
     const initialCount = registry._entries.length;
     registerBuiltinConverters();
     registerBuiltinConverters();
-    expect(registry._entries.length).toBe(initialCount > 0 ? initialCount : 7);
+    expect(registry._entries.length).toBe(initialCount > 0 ? initialCount : 8);
   });
 });
