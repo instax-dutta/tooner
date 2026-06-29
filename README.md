@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/og-image.png" alt="Tooner" width="600">
+  <img src="public/og-image.png" alt="Tooner - AI-Ready File Optimization" width="600">
 </p>
 
 <p align="center">
@@ -18,18 +18,32 @@
 
 ---
 
-**Tooner** converts documents, data files, and code into token-optimized `.toon` files for feeding into LLMs. All processing happens in your browser. Zero servers. Zero uploads.
+### Stop paying LLMs to read layout formatting bloat.
 
-[Try it now →](https://tooner.sdad.pro)
+Tooner is a 100% client-side, privacy-first web utility that converts documents, raw database tables, and codebases into token-optimized `.toon` files. By combining **MarkItDownJS** with format-aware semantic parsers and heading-based chunk splitters, Tooner trims down token overhead by **15% to 40%** before you paste your files into ChatGPT, Claude, or Gemini.
+
+[Deploy to Netlify or Run Locally — 100% sandboxed in your browser →](https://tooner.sdad.pro)
+
+---
+
+## Why Tooner? (Core Value Positioning)
+
+*   **RAG-Ready Heading Splitting:** Splits documents dynamically on Markdown heading boundaries (`#`, `##`) and paragraph limits to generate index-ready RAG chunks with pre-calculated token sizes.
+*   **Zero Server Risk (Risk Reversal):** Proprietary source code, PDF transcripts, and raw database sheets never leave your device. All parsers (PDF.js, mammoth, SheetJS, MarkItDownJS) execute locally in your browser sandbox using client-side JavaScript and WebAssembly.
+*   **Semantic Noise Collapsing:** Strips out token-guzzling boilerplate: HTML/XML comments, decorative badge svgs, repeating CSV/XLSX header lists, trailing spacing, and multiple column-alignment blanks.
+*   **Base64 Gzip Packing:** Packs the final optimized layout into a highly compressed, portable `.toon` block that decreases raw file sizes by up to 99%.
+
+---
 
 ## Features
 
-- **100% Private** — Files never leave your machine. No server, no upload, no analytics.
-- **Token-Optimized** — Reduce token count via smart content extraction + gzip compression.
-- **10+ Formats** — PDF, DOCX, XLSX, CSV, JSON, XML, Markdown, code files, and more.
-- **LLM-Ready Output** — `.toon` files work directly in ChatGPT, Claude, Gemini. Copy text or download.
-- **Lazy-Loaded** — Heavy deps (PDF.js, SheetJS, Mammoth, gpt-tokenizer) load on demand.
-- **Dark Editorial UI** — Airtable-inspired palette with GSAP + Framer Motion animations, Lenis smooth scroll.
+*   **100% Private** — Runs entirely client-side. Zero server uploads. Zero telemetry.
+*   **MarkItDownJS Engine** — The core document extraction layer is powered by `@markitdownjs/core` for premium Markdown generation.
+*   **12+ Supported Formats** — PDF, DOCX, PPTX, XLSX, XLS, EPUB, CSV, JSON, XML, HTML, Markdown, and source code.
+*   **Format-Aware Compression** — Dedicated optimizers in `src/utils/tokenizer.js` route content based on type (markdown, data, XML, JSON, HTML, and code).
+*   **Lazy-Loaded Bundle** — Heavy parsers (PDF workers, sheet sheet-readers) load asynchronously only when the specific file format is dropped.
+
+---
 
 ## Quick Start
 
@@ -38,81 +52,86 @@ git clone https://github.com/instax-dutta/tooner.git
 cd tooner
 npm install
 npm run dev       # → http://localhost:5173
-npm run build     # → dist/
-npm run test      # ~22 tests, vitest
+npm run build     # → dist/ (serve with any static host)
+npm run test      # → run vitest checks
 ```
+
+---
 
 ## Architecture
 
 ### Converter Registry
 
-Tooner uses a priority-sorted converter registry. Each format is a standalone class extending `DocumentConverter`:
+Tooner manages format conversions through a priority-sorted registry. Custom converters extend the base `DocumentConverter` class:
 
 ```
 src/converters/
-  DocumentConverter.js    # Abstract base (accepts + convert)
-  Registry.js             # Priority-sorted dispatch, singleton
-  fileTypeDetector.js     # Magic bytes → MIME → extension detection
-  StreamInfo.js           # Immutable metadata value object
-  PlainTextConverter.js   # Fallback at priority 10
-  PdfConverter.js         # priority 0
-  DocxConverter.js        # priority 0
-  ExcelConverter.js       # priority 0 (XLSX/XLS)
-  CsvConverter.js         # priority 0
-  JsonConverter.js        # priority 0
-  XmlConverter.js         # priority 0
+  MarkItDownConverter.js  # Primary converter using MarkItDownJS (Priority: 0)
+  PlainTextConverter.js   # Generic fallback (Priority: 10)
+  PdfConverter.js         # Fallback PDF parser (Priority: 5)
+  DocxConverter.js        # Fallback DOCX parser (Priority: 5)
+  ExcelConverter.js       # Fallback spreadsheet reader (Priority: 5)
+  CsvConverter.js         # Fallback CSV converter (Priority: 5)
+  JsonConverter.js        # Fallback JSON reader (Priority: 5)
+  XmlConverter.js         # Fallback XML parser (Priority: 5)
 ```
 
-**Flow**: `DropZone → registry.convert(file, onProgress) → fileTypeDetector.detectFileType() → sorted iter accepts() → first match calls convert() → { content, format } → tokenizer (lazy) → .toon`
+**Flow:** `DropZone` → `registry.convert(file)` → `MarkItDownConverter` (tries primary packages like `@markitdownjs/pdf` or `@markitdownjs/docx`) → falls back to native/mammoth converters on failure → returns `{ content, format }` → `tokenizer.js` → format-aware semantic optimization → heading-based chunk splitter → gzip base64 packaging → `.toon` output.
 
-### State Machine
-
-```
-idle → processing → done → idle
-                  ↘ error ↗
-```
-
-Four states rendered via Framer Motion `AnimatePresence mode="wait"`.
-
-### File Detection
-
-3-tier: magic bytes (first 4096 bytes) → browser `file.type` → extension fallback. ZIP-based disambiguation for `.docx` vs `.xlsx` vs `.pptx`.
+---
 
 ## Supported Formats
 
 | Category | Extensions |
 |----------|-----------|
-| **Documents** | `.pdf` `.docx` `.txt` `.md` `.rtf` |
-| **Data** | `.csv` `.xlsx` `.xls` `.json` `.xml` `.yaml` `.yml` `.toml` |
-| **Code** | `.js` `.jsx` `.ts` `.tsx` `.py` `.java` `.cpp` `.c` `.h` `.hpp` `.cs` `.go` `.rs` `.rb` `.php` `.swift` `.kt` `.html` `.css` `.scss` `.less` `.sql` `.sh` `.bash` `.zsh` |
+| **Documents** | `.pdf` `.docx` `.pptx` `.epub` `.rtf` `.txt` `.md` |
+| **Data & Feeds** | `.csv` `.xlsx` `.xls` `.json` `.xml` `.yaml` `.yml` `.toml` |
+| **Code & Script** | `.js` `.jsx` `.ts` `.tsx` `.py` `.java` `.cpp` `.c` `.h` `.hpp` `.cs` `.go` `.rs` `.rb` `.php` `.swift` `.kt` `.html` `.css` `.scss` `.less` `.sql` `.sh` `.bash` `.zsh` |
 
-All code/markup formats beyond the dedicated converters fall through to `PlainTextConverter`, which accepts anything with a `text/*` MIME type or matching extension.
+---
 
-## .toon Format
+## The .toon Structure
+
+Files are packaged into an optimized JSON wrapper containing structural RAG chunks and gzip-compressed content:
 
 ```json
 {
   "version": "1.0",
-  "lossless": true,
+  "format": "text",
   "original": {
-    "filename": "report.pdf",
-    "format": "pdf",
+    "filename": "annual-report.pdf",
+    "type": "pdf",
     "size": 1048576,
     "tokens": 25000
   },
   "optimized": {
-    "content": "<base64-gzip-compressed>",
+    "content": "<gzip-compressed-base64-string>",
     "encoding": "utf-8",
     "compression": "gzip",
-    "tokens": 14500
+    "tokens": 14500,
+    "reduction": "42%",
+    "isToonFormat": false
   },
+  "chunks": [
+    {
+      "index": 0,
+      "tokens": 1200,
+      "heading": "Introduction & Executive Summary"
+    },
+    {
+      "index": 1,
+      "tokens": 1850,
+      "heading": "Financial Performance Metrics"
+    }
+  ],
   "metadata": {
-    "created": "2026-06-03T16:00:00Z"
+    "created": "2026-06-30T02:00:00.000Z",
+    "generator": "Tooner v1.0"
   }
 }
 ```
 
-The content field is gzip-compressed at level 9 (`fflate`) and base64-encoded. Structured data (JSON) is additionally TOON-encoded via `@toon-format/toon`.
+---
 
 ## Tech Stack
 
@@ -121,41 +140,12 @@ The content field is gzip-compressed at level 9 (`fflate`) and base64-encoded. S
 | **Framework** | React 19, Vite 7 |
 | **Styling** | Tailwind CSS 4, CSS custom properties |
 | **Animation** | GSAP 3.14, Framer Motion 12, Lenis 1.x |
-| **Converters** | PDF.js 5.x (local worker via `?url` import), Mammoth, SheetJS, PapaParse |
+| **Conversion** | MarkItDownJS suite, PDF.js worker, Mammoth, SheetJS, PapaParse |
 | **Tokenization** | gpt-tokenizer, fflate (gzip level 9) |
 | **Format** | @toon-format/toon 2.1 |
-| **Testing** | Vitest (~22 tests) |
-| **Lint** | ESLint 9, eslint-plugin-react, eslint-plugin-react-hooks |
+| **Testing** | Vitest |
 
-### Code Splitting
-
-Manual chunk config in `vite.config.js`:
-
-```
-pdf          → pdfjs-dist
-excel        → xlsx
-docx         → mammoth
-csv          → papaparse             (~19 KB gzipped)
-gzip         → fflate
-gpt-tokenizer → gpt-tokenizer        (~1 MB gzipped)
-toon         → @toon-format/toon
-motion       → framer-motion         (~42 KB gzipped)
-gsap         → gsap                  (~27 KB gzipped)
-lenis        → lenis
-```
-
-Main app bundle: ~217 KB (67 KB gzipped). All others load dynamically during processing.
-
-## Deployment
-
-### Netlify
-
-Deploys from `main` branch. `netlify.toml` handles build config, security headers, immutable asset caching (1 year), and SPA redirects. Custom domain: `tooner.sdad.pro`.
-
-```bash
-npm run build
-# Serve dist/ on any static host — zero server required
-```
+---
 
 ## License
 
