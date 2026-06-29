@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/og-image.png" alt="Tooner - AI-Ready File Optimization" width="600">
+  <img src="public/og-image.png?v=2" alt="Tooner - AI-Ready File Optimization" width="600">
 </p>
 
 <p align="center">
