@@ -15,6 +15,17 @@ const CODE_EXTENSIONS = new Set([
     'cs', 'go', 'rs', 'rb', 'php', 'swift', 'kt',
 ]);
 
+/**
+ * Determine if a format produces or uses Markdown layout
+ * PDF, DOCX, PPTX, HTML, EPUB are all converted to Markdown by MarkItDownJS.
+ * @param {string} format
+ * @returns {boolean}
+ */
+function isMarkdownFormat(format) {
+    const fmt = (format || '').toLowerCase().replace(/^\./, '');
+    return ['md', 'markdown', 'mdx', 'pdf', 'docx', 'pptx', 'epub', 'rtf', 'html', 'htm'].includes(fmt);
+}
+
 // ---------------------------------------------------------------------------
 // Token counting
 // ---------------------------------------------------------------------------
@@ -94,6 +105,21 @@ function optimizeMarkdown(text) {
 
     // Remove empty links: [](url)
     out = out.replace(/\[\]\([^)]*\)/g, '');
+
+    // Collapse multiple consecutive spaces not at the start of a line (retains list indentation)
+    out = out.replace(/(?<!^)[ \t]{2,}/gm, ' ');
+
+    // Normalize space after bullets or lists
+    out = out.replace(/^([ \t]*[-*+])[ \t]{2,}/gm, '$1 ');
+    out = out.replace(/^([ \t]*\d+\.)[ \t]{2,}/gm, '$1 ');
+
+    // Remove spacing inside bold/italic tags
+    out = out.replace(/\*\* +/g, '**').replace(/ +\*\*/g, '**');
+    out = out.replace(/\* +/g, '*').replace(/ +\*/g, '*');
+    out = out.replace(/_ +/g, '_').replace(/ +_/g, '_');
+
+    // Remove empty markdown headers
+    out = out.replace(/^#{1,6}[ \t]*$/gm, '');
 
     // Collapse 2+ consecutive blank lines to 1 blank line
     out = out.replace(/\n{3,}/g, '\n\n');
@@ -328,8 +354,8 @@ export function optimizeContent(content, format) {
 
     const fmt = (format || '').toLowerCase().replace(/^\./, '');
 
-    // Markdown
-    if (fmt === 'md' || fmt === 'markdown' || fmt === 'mdx') {
+    // Markdown & Document layouts converted to Markdown by MarkItDown
+    if (isMarkdownFormat(fmt)) {
         return { content: optimizeMarkdown(content), isToon: false };
     }
 
@@ -473,8 +499,7 @@ function splitLargeSection(text) {
  * @returns {Promise<Array<{ index: number, content: string, tokens: number, heading: string|null }>>}
  */
 async function createChunks(content, format) {
-    const fmt = (format || '').toLowerCase().replace(/^\./, '');
-    const isMarkdown = fmt === 'md' || fmt === 'markdown' || fmt === 'mdx';
+    const isMarkdown = isMarkdownFormat(format);
 
     /** @type {{ heading: string|null, body: string }[]} */
     const rawSections = [];
