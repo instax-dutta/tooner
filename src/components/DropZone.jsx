@@ -1,9 +1,78 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getAcceptedTypes, isSupported } from '../converters';
+import ModelSelector from './ModelSelector';
+import useSettingsStore from '../store/useSettingsStore';
 
 const SOCIAL_PROOF_BASE = 1842;
-const SOCIAL_PROOF_LABELS = ['files optimized', 'docs converted', 'uploads processed'];
+
+function ChunkConfig() {
+    const { chunkOverlap, setChunkOverlap, chunkSize, setChunkSize } = useSettingsStore();
+    const [show, setShow] = useState(false);
+
+    return (
+        <div className="mt-2 w-full max-w-lg">
+            <button
+                onClick={() => setShow(!show)}
+                className="text-muted-foreground/50 hover:text-muted-foreground text-[10px] font-medium
+                    flex items-center gap-1 transition-colors cursor-pointer mx-auto"
+            >
+                <svg className={`w-2.5 h-2.5 transition-transform ${show ? 'rotate-180' : ''}`}
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+                Chunk settings
+            </button>
+            <AnimatePresence>
+                {show && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden"
+                    >
+                        <div className="mt-2 px-3 py-2 bg-card border border-border rounded-lg space-y-2">
+                            <div className="flex items-center justify-between gap-3">
+                                <label className="text-[10px] text-muted-foreground uppercase tracking-wider whitespace-nowrap">
+                                    Chunk size
+                                </label>
+                                <div className="flex items-center gap-2 flex-1">
+                                    <input
+                                        type="range"
+                                        min={256}
+                                        max={4096}
+                                        step={256}
+                                        value={chunkSize}
+                                        onChange={(e) => setChunkSize(Number(e.target.value))}
+                                        className="flex-1 h-1 accent-accent"
+                                    />
+                                    <span className="text-[10px] font-mono text-foreground w-10 text-right">{chunkSize}</span>
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between gap-3">
+                                <label className="text-[10px] text-muted-foreground uppercase tracking-wider whitespace-nowrap">
+                                    Overlap
+                                </label>
+                                <div className="flex items-center gap-2 flex-1">
+                                    <input
+                                        type="range"
+                                        min={0}
+                                        max={512}
+                                        step={32}
+                                        value={chunkOverlap}
+                                        onChange={(e) => setChunkOverlap(Number(e.target.value))}
+                                        className="flex-1 h-1 accent-accent"
+                                    />
+                                    <span className="text-[10px] font-mono text-foreground w-10 text-right">{chunkOverlap}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
 
 function useSocialProof() {
     const [count] = useState(() => {
@@ -28,14 +97,13 @@ const FORMAT_BADGES = [
   { label: 'Code', ext: null, icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' },
 ];
 
-export default function DropZone({ onFileSelect, isProcessing }) {
+export default function DropZone({ onFileSelect, onBatchSelect, isProcessing }) {
     const [isDragging, setIsDragging] = useState(false);
     const [error, setError] = useState(null);
     const [showFormats, setShowFormats] = useState(false);
     const fileInputRef = useRef(null);
     const dragCountRef = useRef(0);
     const proofCount = useSocialProof();
-    const proofLabel = SOCIAL_PROOF_LABELS[proofCount % SOCIAL_PROOF_LABELS.length];
 
     const handleDragEnter = useCallback((e) => {
         e.preventDefault();
@@ -89,9 +157,13 @@ export default function DropZone({ onFileSelect, isProcessing }) {
 
         const files = e.dataTransfer?.files;
         if (files?.length > 0) {
-            validateAndSelectFile(files[0]);
+            if (files.length > 1 && onBatchSelect) {
+                onBatchSelect(files);
+            } else {
+                validateAndSelectFile(files[0]);
+            }
         }
-    }, [isProcessing, validateAndSelectFile]);
+    }, [isProcessing, validateAndSelectFile, onBatchSelect]);
 
     const handleClick = () => {
         if (!isProcessing) {
@@ -135,7 +207,7 @@ export default function DropZone({ onFileSelect, isProcessing }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="flex flex-col items-center justify-center h-full px-4 sm:px-6 py-6"
+            className="flex flex-col items-center justify-center h-full px-4 sm:px-6 py-4"
         >
             <motion.div
                 initial={{ opacity: 0, y: 16 }}
@@ -147,18 +219,18 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                     Optimize any file for AI
                 </h1>
                 <p className="text-muted-foreground text-sm sm:text-base max-w-md mx-auto leading-relaxed">
-                    Stop overpaying for bloated tokens. Convert PDFs, docs, and data files to{' '}
+                    Convert PDFs, docs, and data files to{' '}
                     <span className="font-mono text-secondary-foreground">.toon</span>
-                    {' '}— <span className="text-accent font-medium">AI-optimized</span>, private, free.
+                    {' '}— <span className="text-accent font-medium">lossless</span>, private, free.
                 </p>
                 <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.7 }}
-                    className="text-muted-foreground/50 text-[11px] mt-3"
+                    className="text-muted-foreground/50 text-xs mt-3"
                 >
                     <span className="text-accent/70 font-medium">{proofCount.toLocaleString()}</span>{' '}
-                    {proofLabel} this week
+                    files optimized this week
                 </motion.p>
             </motion.div>
 
@@ -257,6 +329,18 @@ export default function DropZone({ onFileSelect, isProcessing }) {
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="mt-3 w-full max-w-lg"
+            >
+                <p className="text-muted-foreground/50 text-[10px] text-center mb-1 uppercase tracking-wider">Target model</p>
+                <ModelSelector />
+            </motion.div>
+
+            <ChunkConfig />
+
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
                 className="mt-4 flex flex-col items-center gap-3"
             >
@@ -295,7 +379,7 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                                         </svg>
                                         {badge.label}
                                         {badge.ext && (
-                                            <span className="text-muted-foreground font-mono text-[9px]">{badge.ext}</span>
+                                            <span className="text-muted-foreground font-mono text-xs">{badge.ext}</span>
                                         )}
                                     </span>
                                 ))}
@@ -305,11 +389,42 @@ export default function DropZone({ onFileSelect, isProcessing }) {
                 </AnimatePresence>
             </motion.div>
 
+            {onBatchSelect && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.55 }}
+                className="mt-2"
+              >
+                <button
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.multiple = true;
+                    input.accept = getAcceptedTypes();
+                    input.onchange = (e) => {
+                      if (e.target.files?.length > 1) {
+                        onBatchSelect(e.target.files);
+                      }
+                    };
+                    input.click();
+                  }}
+                  className="text-muted-foreground hover:text-foreground text-[11px] font-medium
+                    flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                  Batch mode — drop multiple files
+                </button>
+              </motion.div>
+            )}
+
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="mt-4 flex flex-wrap items-center justify-center gap-4 text-[11px] text-muted-foreground"
+                className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground"
             >
                 <span className="flex items-center gap-1">
                     <svg className="w-3 h-3 text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -39,7 +39,7 @@ export default function ProcessingView({ file, progress, onCancel }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex flex-col items-center justify-center h-full px-4 sm:px-6 py-6"
+            className="flex flex-col items-center justify-center h-full px-4 sm:px-6 py-4"
         >
             <div ref={containerRef} className="card w-full max-w-sm sm:max-w-md text-center p-6 sm:p-8">
                 <motion.div
@@ -50,7 +50,7 @@ export default function ProcessingView({ file, progress, onCancel }) {
                     className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center
                         bg-accent/10 border border-accent/20 mx-auto mb-4"
                 >
-                    <svg className="w-5.5 h-5.5 sm:w-6 sm:h-6 text-accent" fill="none" stroke="currentColor"
+                    <svg className="w-6 h-6 text-accent" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d={stage.icon} />
                     </svg>
@@ -74,10 +74,10 @@ export default function ProcessingView({ file, progress, onCancel }) {
                     </span>
                 </h3>
 
-                <p className="text-secondary-foreground mb-1 truncate max-w-full font-mono text-xs">
+                <p className="text-secondary-foreground mb-1 truncate max-w-full font-mono text-xs" title={file.name}>
                     {file.name}
                 </p>
-                <p className="text-muted-foreground text-xs mb-5">
+                <p className="text-muted-foreground text-xs mb-4">
                     {formatSize(file.size)}
                 </p>
 

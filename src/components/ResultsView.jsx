@@ -1,27 +1,32 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { formatSize, formatTokens, getToonFilename, createToonBlob } from '../utils/format';
+import { estimateCost, getModel } from '../utils/models';
+import useSettingsStore from '../store/useSettingsStore';
+import ChunkPreview from './ChunkPreview';
+import ToonExplainer from './ToonExplainer';
+import ShareModal from './ShareModal';
 
 function StatRow({ label, leftValue, leftSub, rightValue, rightSub, positive }) {
     return (
         <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
                 <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-0.5">{label}</div>
-                <span className="block text-lg sm:text-xl font-medium text-foreground font-mono tracking-tight">
+                <span className="block text-2xl sm:text-3xl font-medium text-foreground font-mono tracking-tight">
                     {leftValue}
                 </span>
-                <span className="text-[9px] text-muted-foreground uppercase tracking-wider">{leftSub}</span>
+                <span className="text-xs text-muted-foreground uppercase tracking-wider">{leftSub}</span>
             </div>
             <svg className="w-4 h-4 text-muted-foreground mt-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
             <div className="flex-1 min-w-0 text-right">
                 <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-0.5 opacity-0">{label}</div>
-                <span className={`block text-lg sm:text-xl font-medium font-mono tracking-tight ${positive ? 'text-accent' : 'text-destructive'}`}>
+                <span className={`block text-2xl sm:text-3xl font-medium font-mono tracking-tight ${positive ? 'text-accent' : 'text-destructive'}`}>
                     {rightValue}
                 </span>
-                <span className="text-[9px] text-muted-foreground uppercase tracking-wider">{rightSub}</span>
+                <span className="text-xs text-muted-foreground uppercase tracking-wider">{rightSub}</span>
             </div>
         </div>
     );
@@ -30,8 +35,14 @@ function StatRow({ label, leftValue, leftSub, rightValue, rightSub, positive }) 
 export default function ResultsView({ file, stats, toonFile, onReset }) {
     const [copied, setCopied] = useState(false);
     const [downloading, setDownloading] = useState(false);
+    const [showChunks, setShowChunks] = useState(false);
+    const [showShare, setShowShare] = useState(false);
     const containerRef = useRef(null);
     const successRef = useRef(null);
+    const { selectedModel } = useSettingsStore();
+    const model = getModel(selectedModel);
+    const originalCost = estimateCost(stats.originalTokens, selectedModel);
+    const optimizedCost = estimateCost(stats.optimizedTokens, selectedModel);
     const cardRef = useRef(null);
 
     useEffect(() => {
@@ -121,6 +132,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.15 }}
                 className="text-muted-foreground text-xs font-mono mb-3 sm:mb-4 text-center max-w-[80vw] truncate"
+                title={file.name}
             >
                 {file.name}
             </motion.p>
@@ -159,7 +171,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                         <span className={`text-xl sm:text-2xl font-medium leading-none ${compressionPositive ? 'text-accent' : 'text-destructive'}`}>
                             {compressionPositive ? `-${Math.abs(stats.sizeReduction)}%` : `+${Math.abs(stats.sizeReduction)}%`}
                         </span>
-                        <div className="text-[9px] text-muted-foreground uppercase tracking-wider mt-1">Size saved</div>
+                        <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">Size saved</div>
                     </div>
                     {stats.tokenReduction > 0 && (
                         <>
@@ -168,7 +180,7 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                                 <span className="text-xl sm:text-2xl font-medium leading-none text-accent">
                                     -{stats.tokenReduction}%
                                 </span>
-                                <div className="text-[9px] text-muted-foreground uppercase tracking-wider mt-1">Tokens saved</div>
+                                <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">Tokens saved</div>
                             </div>
                         </>
                     )}
@@ -179,12 +191,47 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                                 <span className="text-xl sm:text-2xl font-medium leading-none text-foreground font-mono">
                                     {stats.chunks.length}
                                 </span>
-                                <div className="text-[9px] text-muted-foreground uppercase tracking-wider mt-1">RAG Chunks</div>
+                                <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">RAG Chunks</div>
                             </div>
                         </>
                     )}
                 </div>
             </motion.div>
+
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.35 }}
+                className="w-full max-w-sm sm:max-w-md mb-3"
+            >
+                <div className="flex items-center justify-between px-1 text-xs">
+                    <span className="text-muted-foreground">
+                        Est. cost with <span className="font-medium text-foreground">{model?.name || 'GPT-4o'}</span>
+                    </span>
+                    <span className="font-mono">
+                        <span className="text-muted-foreground line-through mr-1.5">{originalCost.formatted}</span>
+                        <span className="text-accent font-medium">{optimizedCost.formatted}</span>
+                    </span>
+                </div>
+            </motion.div>
+
+            {stats.chunks && stats.chunks.length > 0 && (
+              <div className="w-full max-w-sm sm:max-w-md">
+                <button
+                  onClick={() => setShowChunks(!showChunks)}
+                  className="text-muted-foreground hover:text-foreground text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer mt-1"
+                >
+                  <svg className={`w-3 h-3 transition-transform duration-200 ${showChunks ? 'rotate-180' : ''}`}
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                  {showChunks ? 'Hide' : 'View'} {stats.chunks.length} chunks
+                </button>
+                <AnimatePresence>
+                  {showChunks && <ChunkPreview chunks={stats.chunks} />}
+                </AnimatePresence>
+              </div>
+            )}
 
             <motion.div
                 initial={{ opacity: 0, y: 14 }}
@@ -242,13 +289,35 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                transition={{ delay: 0.35 }}
+                className="w-full max-w-sm sm:max-w-md"
+            >
+                <motion.button
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setShowShare(true)}
+                    className="btn btn-ghost w-full py-2 text-xs font-medium"
+                >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Share link
+                </motion.button>
+            </motion.div>
+
+            {showShare && (
+                <ShareModal toonFile={toonFile} onClose={() => setShowShare(false)} />
+            )}
+
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
                 className="mt-3 sm:mt-4 flex flex-col items-center gap-2 sm:gap-3"
             >
                 <motion.button
                     whileTap={{ scale: 0.98 }}
                     onClick={onReset}
-                    className="btn btn-ghost py-2 px-4 text-xs font-medium"
+                    className="btn btn-secondary py-2 px-4 text-xs font-medium"
                 >
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -257,16 +326,18 @@ export default function ResultsView({ file, stats, toonFile, onReset }) {
                 </motion.button>
 
                 <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] text-muted-foreground/50 uppercase tracking-widest mr-1">Feed to</span>
+                    <span className="text-xs text-muted-foreground/50 uppercase tracking-widest mr-1">Works with</span>
                     {['ChatGPT', 'Claude', 'Gemini'].map((name) => (
                         <span key={name}
                             className="inline-flex items-center px-2 py-0.5 bg-card border border-border rounded-full
-                                text-[9px] font-medium text-secondary-foreground"
+                                text-xs font-medium text-secondary-foreground"
                         >
                             {name}
                         </span>
                     ))}
                 </div>
+
+                <ToonExplainer />
             </motion.div>
         </motion.div>
     );

@@ -12,10 +12,6 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'pdf': ['pdfjs-dist'],
-          'excel': ['xlsx'],
-          'docx': ['mammoth'],
-          'csv': ['papaparse'],
           'gzip': ['fflate'],
           'gpt-tokenizer': ['gpt-tokenizer'],
           'toon': ['@toon-format/toon'],
@@ -25,11 +21,10 @@ export default defineConfig({
         },
       },
     },
-    chunkSizeWarningLimit: 2000, // Heavy libs are lazy-loaded
+    chunkSizeWarningLimit: 2000,
   },
   optimizeDeps: {
     include: ['react', 'react-dom'],
-    exclude: ['pdfjs-dist'], // Let it load dynamically
   },
   worker: {
     format: 'es',
