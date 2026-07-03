@@ -28,7 +28,23 @@ function App() {
   useEffect(() => {
     checkForSharedData().then((toonFile) => {
       if (toonFile) {
-        setDone({ toonFile, stats: { originalTokens: 0, optimizedTokens: 0, tokenReduction: 0, originalSize: 0, compressedSize: 0, sizeReduction: 0, rawContent: '', isToonFormat: false, chunks: toonFile.chunks || [] } });
+        const orig = toonFile.original || {};
+        const fakeFile = { name: orig.filename || 'shared.toon', size: orig.size || 0 };
+        setProcessing(fakeFile);
+        setDone({
+          toonFile,
+          stats: {
+            originalTokens: orig.tokens || 0,
+            optimizedTokens: toonFile.optimized?.tokens || 0,
+            tokenReduction: 0,
+            originalSize: orig.size || 0,
+            compressedSize: 0,
+            sizeReduction: 0,
+            rawContent: '',
+            isToonFormat: toonFile.optimized?.isToonFormat || false,
+            chunks: toonFile.chunks || [],
+          },
+        });
       }
     });
   }, []);
